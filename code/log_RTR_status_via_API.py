@@ -2,11 +2,12 @@ import os
 from datetime import datetime
 import requests
 import xlsxwriter
+import sys
 
 root            = "G:\\Github\waterschapsverordening_log_RTR_status"
-enviroment      = "Pre"
-api_key_file    = f"code/{enviroment}_API-key.txt"
+enviroment      = str(sys.argv[1])
 activities_file = f"data/{enviroment}_Activiteiten_Waterschapsverordening.txt"
+api_key_file    = f"code/{enviroment}_API-key.txt"
 retrieval_date  = datetime.now().strftime("%d-%m-%Y")
 
 class CallRTR:
