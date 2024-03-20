@@ -1,0 +1,85 @@
+Lozingsactiviteit gereguleerd in de waterschapsverordening		nl.imow-ws0636.activiteit.ActInWaterschapsVerordWs	nl.imow-ws0636.activiteit.LozingsActiviteit	Zorgplicht	Lozingsactiviteit	2.1	HDSR
+lozen van grondwater bij sanering of ontwatering	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenGrondwaterSanOnt	Zorgplicht	Lozingsactiviteit	2.2	HDSR
+lozen van afvloeiend hemelwater dat niet afkomstig is van een bodembeschermende voorziening	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenAfvlHemelwater	Zorgplicht	Lozingsactiviteit	2.3	HDSR
+lozen van huishoudelijk afvalwater	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenHuishoudAfvalw	Zorgplicht	Lozingsactiviteit	2.4	HDSR
+lozen van koelwater	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenKoelwater	Zorgplicht	Lozingsactiviteit	2.5	HDSR
+lozen bij reinigen, conserveren, bouwen, renoveren, of slopen van bouwwerken	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenReinigenSlopen	Zorgplicht	Lozingsactiviteit	2.6	HDSR
+lozen bij opslaan en overslaan van inerte goederen	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenInerteGoed	Zorgplicht	Lozingsactiviteit	2.7	HDSR
+lozen bij opslaan en overslaan van niet inerte goederen	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenNietInerteGoed	Zorgplicht	Lozingsactiviteit	2.8	HDSR
+lozen uit gemeentelijke voorzieningen voor inzameling en transport van afvalwater	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenGemTranspAfvalw	Zorgplicht	Lozingsactiviteit	2.9	HDSR
+lozen bij ontgravingen, baggerwerkzaamheden en werkzaamheden door de waterbeheerder op een oppervlaktewaterlichaam	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenOntgravingBagger	Zorgplicht	Lozingsactiviteit	2.10	HDSR
+lozen bij schoonmaken drinkwaterleidingen	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenSchmDrinkWatLeid	Zorgplicht	Lozingsactiviteit	2.11	HDSR
+lozen bij calamiteitenoefeningen	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenCalam	Zorgplicht	Lozingsactiviteit	2.12	HDSR
+lozen bij telen, kweken, spoelen of sorteren van gewassen	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenTelenKweSpoSorGew	Zorgplicht	Lozingsactiviteit	2.13	HDSR
+lozen bij maken van betonmortel en uitwassen van beton	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenBijMakBetonmortUitBet	Zorgplicht	Lozingsactiviteit	2.14	HDSR
+lozen bij niet-industriële voedselbereiding	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenNietIndustrVoed	Zorgplicht	Lozingsactiviteit	2.15	HDSR
+lozen van spuiwater uit recreatieve visvijvers	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenSpuiwaterUitRecVis	Zorgplicht	Lozingsactiviteit	2.16	HDSR
+lozen vanaf vaartuigen of andere drijvende werktuigen bij spoelen of scheiden van zand of grind	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenVVDrijWerkSpoSZGr	Zorgplicht	Lozingsactiviteit	2.17	HDSR
+asverstrooiing	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.Asverstrooiing	Zorgplicht	Lozingsactiviteit	2.18	HDSR
+andere lozingen	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.AndereLozingen	Zorgplicht	Lozingsactiviteit	2.19	HDSR
+Wateronttrekkingsactiviteit gereguleerd in de waterschapsverordening		nl.imow-ws0636.activiteit.ActInWaterschapsVerordWs	nl.imow-ws0636.activiteit.WateronttrekAct	Zorgplicht	Wateronttrekkingsactiviteit	3.1	HDSR
+oppervlaktewater onttrekken	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.OppervlakteWatOnttrek	Zorgplicht	Wateronttrekkingsactiviteit	3.8	HDSR
+water in de bodem of terug in de bodem brengen	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.WaterTerugInDeBodemBrengen	Zorgplicht	Wateronttrekkingsactiviteit	3.7	HDSR
+grondwater onttrekken	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.GrondwaterOnttrek	Zorgplicht	Wateronttrekkingsactiviteit	3.3	HDSR
+Beperkingengebiedactiviteit met betrekking tot een waterstaatswerk in beheer bij het waterschap		nl.imow-ws0636.activiteit.ActInWaterschapsVerordWs	nl.imow-ws0636.activiteit.BeperkingengebiedAct	Zorgplicht	Beperkingengebiedactiviteit	4.1	HDSR
+brug aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.BrugAanleggen	Zorgplicht	Beperkingengebiedactiviteit	4.7.1	HDSR
+brug verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.BrugVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.7.2	HDSR
+brugdek vervangen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.BrugdekVervangen	Zorgplicht	Beperkingengebiedactiviteit	4.7.3	HDSR
+explosiegevaarlijk materiaal opslaan	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.ExplosiefMatOpslaan	Zorgplicht	Beperkingengebiedactiviteit	4.33	HDSR
+peilafwijking realiseren	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.PeilAfwijking	Zorgplicht	Beperkingengebiedactiviteit	4.25	HDSR
+beweiden	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.Beweiden	Zorgplicht	Beperkingengebiedactiviteit	4.18	HDSR
+seismisch onderzoek uitvoeren	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.SeismischOnderzoek	Zorgplicht	Beperkingengebiedactiviteit	4.32	HDSR
+steiger aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.SteigerAanleggen	Zorgplicht	Beperkingengebiedactiviteit	4.8.1	HDSR
+steiger verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.SteigerVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.8.2	HDSR
+beschoeiing of damwand aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.BeschoeiingAanleggen	Zorgplicht	Beperkingengebiedactiviteit	4.9.1	HDSR
+beschoeiing of damwand verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.BeschoeiingVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.9.2	HDSR
+beschoeiing of damwand vervangen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.BeschoeiingVervangen	Zorgplicht	Beperkingengebiedactiviteit	4.9.3	HDSR
+uitstroomvoorziening of onttrekkingsvoorziening aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.UitstroomOnttrekking	Zorgplicht	Beperkingengebiedactiviteit	4.10.1	HDSR
+uitstroomvoorziening of onttrekkingsvoorziening verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.UitstroomOnttVer	Zorgplicht	Beperkingengebiedactiviteit	4.10.2	HDSR
+hekwerk, schutting of afrastering aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.HekwerkSchuttingAfr	Zorgplicht	Beperkingengebiedactiviteit	4.13.1	HDSR
+hekwerk, schutting of afrastering verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.HekwerkSchuttingAfrVer	Zorgplicht	Beperkingengebiedactiviteit	4.13.2	HDSR
+weg of verharding aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.WegPadVerharding	Zorgplicht	Beperkingengebiedactiviteit	4.17.1	HDSR
+weg of verharding veranderen of verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.WegVerhardingVerandVer	Zorgplicht	Beperkingengebiedactiviteit	4.17.2	HDSR
+bouwwerk geen gebouw zijnde oprichten	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.BouwwerkNietGeb	Zorgplicht	Beperkingengebiedactiviteit	4.14.1	HDSR
+bouwwerk geen gebouw zijnde verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.BouwwerkNietGebVer	Zorgplicht	Beperkingengebiedactiviteit	4.14.2	HDSR
+gebouw oprichten of aanpassen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.GebouwOprichten	Zorgplicht	Beperkingengebiedactiviteit	4.16.1	HDSR
+gebouw verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.GebouwVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.16.2	HDSR
+bemesten	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.Bemesten	Zorgplicht	Beperkingengebiedactiviteit	4.19	HDSR
+grond bewerken	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.GrondBewerken	Zorgplicht	Beperkingengebiedactiviteit	4.20	HDSR
+grasmat vervangen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.GrasmatVervangen	Zorgplicht	Beperkingengebiedactiviteit	4.21	HDSR
+beplanting aanbrengen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.BeplantingAanbrengen	Zorgplicht	Beperkingengebiedactiviteit	4.12.1	HDSR
+beplanting verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.BeplantingVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.12.2	HDSR
+peilscheiding aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.PeilscheidingAanleggen	Zorgplicht	Beperkingengebiedactiviteit	4.29.1	HDSR
+peilscheiding verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.PeilscheidingVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.29.2	HDSR
+peilscheiding vervangen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.PeilscheidingVervangen	Zorgplicht	Beperkingengebiedactiviteit	4.29.3	HDSR
+sluis aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.SluisAanleggen	Zorgplicht	Beperkingengebiedactiviteit	4.28.1	HDSR
+sluis verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.SluisVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.28.2	HDSR
+sluis vervangen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.SluisVervangen	Zorgplicht	Beperkingengebiedactiviteit	4.28.3	HDSR
+afsluitbare duiker aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.AfsluitbareDuikerAan	Zorgplicht	Beperkingengebiedactiviteit	4.30.1	HDSR
+afsluitbare duiker verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.AfsluitbareDuikerVerw	Zorgplicht	Beperkingengebiedactiviteit	4.30.2	HDSR
+afsluitbare duiker vervangen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.AfsluitbareDuikerVer	Zorgplicht	Beperkingengebiedactiviteit	4.30.3	HDSR
+stuw aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.StuwAanleggen	Zorgplicht	Beperkingengebiedactiviteit	4.27.1	HDSR
+stuw verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.StuwVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.27.2	HDSR
+stuw vervangen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.StuwVervangen	Zorgplicht	Beperkingengebiedactiviteit	4.27.3	HDSR
+kabel of leiding aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.KabelLeidingAanleggen	Zorgplicht	Beperkingengebiedactiviteit	4.11.1	HDSR
+kabel of leiding verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.KabelLeidingVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.11.2	HDSR
+bodemenergiesysteem aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.BodemEnergieAanleg	Zorgplicht	Beperkingengebiedactiviteit	4.23.1	HDSR
+bodemenergiesysteem verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.BodemEnergieVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.23.2	HDSR
+grondboring of sondering uitvoeren	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.GrondboringOfSondering	Zorgplicht	Beperkingengebiedactiviteit	4.22	HDSR
+gemaal aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.GemaalAanleggen	Zorgplicht	Beperkingengebiedactiviteit	4.26.1	HDSR
+gemaal verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.GemaalVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.26.2	HDSR
+gemaal vervangen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.GemaalVervangen	Zorgplicht	Beperkingengebiedactiviteit	4.26.3	HDSR
+dam met duiker aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.DamMetDuikerAanleggen	Zorgplicht	Beperkingengebiedactiviteit	4.5.1	HDSR
+dam met duiker verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.DamMetDuikerVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.5.2	HDSR
+duiker aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.DuikerAanleggen	Zorgplicht	Beperkingengebiedactiviteit	4.4.1	HDSR
+duiker verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.DuikerVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.4.2	HDSR
+duiker vervangen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.DuikerVervangen	Zorgplicht	Beperkingengebiedactiviteit	4.4.3	HDSR
+dichte dam aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.DichteDamAanleggen	Zorgplicht	Beperkingengebiedactiviteit	4.6.1	HDSR
+dichte dam verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.DichteDamVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.6.2	HDSR
+vispassage aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.VispassageAanleggen	Zorgplicht	Beperkingengebiedactiviteit	4.31.1	HDSR
+vispassage verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.VispassageVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.31.2	HDSR
+natuurvriendelijke oever aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.NVOAanleggen	Zorgplicht	Beperkingengebiedactiviteit	4.15.1	HDSR
+natuurvriendelijke oever verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.NVOVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.15.2	HDSR
+graven	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.graven	Zorgplicht	Beperkingengebiedactiviteit	4.2	HDSR
+grond of ander materiaal aanbrengen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.GrondAnderMatAanbr	Zorgplicht	Beperkingengebiedactiviteit	4.3	HDSR
+evenement houden	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.EvenmentHouden	Zorgplicht	Beperkingengebiedactiviteit	4.24	HDSR

@@ -1,0 +1,9 @@
+# Exclude Python bloat
+*.pyc
+
+# Exclude xlsx bloat
+log/~$*
+
+# Exclude API-keys
+code/Pre_API-key.txt
+code/Prod_API-key.txt
