@@ -15,7 +15,7 @@ enviroment      = "Pre"
 steiger aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.SteigerAanleggen	Zorgplicht	Beperkingengebiedactiviteit	4.8.1	HDSR
 ```
 Deze gegevens staan voor HDSR in het Match model onder frames, selecteer de gewenste activiteiten en plak ze in de bovengenoemde txt files.
-[](./data/ActiviteitenFrame.PNG)
+[selecteer de gewenste activiteiten en plak ze in de bovengenoemde txt files.](./data/ActiviteitenFrame.PNG)
 
 - Automatisch wordt de huidige datum gebruikt voor het draaien van het script, in de RTR kun je ook terug in de tijd, of in de toekomst zoeken. Je kunt de variabele 'retrieval_date' aanpassen naar de gewenste datum bijvoorbeeld "01-01-2024".
 ```
