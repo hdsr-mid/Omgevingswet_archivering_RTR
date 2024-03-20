@@ -2,8 +2,12 @@ Python script om de status van de Registratie Toepasbare Regels naar .xlsx forma
 
 - Voeg de productie en pre API-keys toe aan de files in de volgende folder, deze keys kun je aanvragen bij [Iplo](https://aandeslagmetdeomgevingswet.nl/ontwikkelaarsportaal/api-register/api/omgevingsdocument-toepasbaar-opvragen/).
 ```
-    code/Prod_API-key.txt
-    code/Pre_API-key.txt
+code/Prod_API-key.txt
+code/Pre_API-key.txt
+```
+- Door de variabele 'enviroment' aan te passen naar "Prod" of "Pre" kan van omgeving worden gewisseld
+```
+enviroment      = "Pre"
 ```
 - Open code/log_RTR_status_via_API.py en zorg dat je root directory gelijk is aan het pad van de github repository
 - Om bij de juiste activiteiten aan te komen moet je het bestand 'Prod_Activiteiten_Waterschapsverordening.txt' of 'Pre_Activiteiten_Waterschapsverordening.txt' vullen met de gewenste activiteiten en hun meta data. Voor de activiteit stijger aanleggen ziet dat er bij HDSR zo uit:
