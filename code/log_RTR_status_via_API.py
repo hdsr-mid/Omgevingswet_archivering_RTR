@@ -9,7 +9,7 @@ api_key_file    = f"code/{enviroment}_API-key.txt"
 activities_file = f"data/{enviroment}_Activiteiten_Waterschapsverordening.txt"
 retrieval_date  = datetime.now().strftime("%d-%m-%Y")
 
-class APIUtility:
+class LogRTR:
     def __init__(self, root_directory, api_key_file, activities_file, retrieval_date):
         self.root_directory = root_directory
         os.chdir(self.root_directory)
@@ -108,28 +108,28 @@ class APIUtility:
     def fetch_and_process_changes(self, session, data):
         changes = ["", "", "", ""]
         if "regelBeheerObjecten" in data:
-            for obj in data["regelBeheerObjecten"]:
-                objectType = obj["typering"]
-                if objectType == "Indieningsvereisten":
-                    objectType = obj["toestemming"]["waarde"]
-                functionalStructRef = obj["functioneleStructuurRef"]
-                lastChanged = self.fetch_last_changed_date(session, functionalStructRef)
-                if objectType in {"Conclusie", "Melding", "Aanvraag vergunning", "Informatie"}:
+            for object in data["regelBeheerObjecten"]:
+                object_type = object["typering"]
+                if object_type == "Indieningsvereisten":
+                    object_type = object["toestemming"]["waarde"]
+                functional_structure_reference = object["functioneleStructuurRef"]
+                lastChanged = self.fetch_last_changed_date(session, functional_structure_reference)
+                if object_type in {"Conclusie", "Melding", "Aanvraag vergunning", "Informatie"}:
                     index = ["Conclusie", "Melding", "Aanvraag vergunning", "Informatie"].index(
-                        objectType
+                        object_type
                     )
                     changes[index] = lastChanged
         return changes
 
-    def fetch_last_changed_date(self, session, functionalStructRef):
-        url = self.compose_regel_beheer_object_url(functionalStructRef)
+    def fetch_last_changed_date(self, session, functional_structure_reference):
+        url = self.compose_regel_beheer_object_url(functional_structure_reference)
         response = session.get(url, headers=self.headers)
         if response.ok:
             data = response.json()
             embedded = data.get('_embedded', {})
-            toepasbareRegels = embedded.get('toepasbareRegels', [])
-            if toepasbareRegels:
-                return toepasbareRegels[0].get("laatsteWijzigingDatum", "")
+            toepasbare_regels = embedded.get('toepasbare_regels', [])
+            if toepasbare_regels:
+                return toepasbare_regels[0].get("laatsteWijzigingDatum", "")
         return ""
 
     @staticmethod
@@ -143,8 +143,8 @@ class APIUtility:
     def compose_activity_url(self, uri):
         return f"{self.base_url}/rtrgegevens/v2/activiteiten/{uri}?datum={self.retrieval_date}"
 
-    def compose_regel_beheer_object_url(self, functionalStructRef):
-        return f"{self.base_url}/toepasbareregelsuitvoerengegevens/v1/toepasbareRegels?functioneleStructuurRef={functionalStructRef}&datum={self.retrieval_date}"
+    def compose_regel_beheer_object_url(self, functional_structure_reference):
+        return f"{self.base_url}/toepasbareregelsuitvoerengegevens/v1/toepasbare_regels?functioneleStructuurRef={functional_structure_reference}&datum={self.retrieval_date}"
 
     def log_activity_data(self, session, row, name, uri, activity_group, rule_reference, data):
         werkzaamheden = self.extract_werkzaamheden(data)
@@ -155,8 +155,8 @@ class APIUtility:
         
 
 def main():
-    api_utility = APIUtility(root, api_key_file, activities_file, retrieval_date)
-    api_utility.retrieve_and_log_data()
+    rtr = LogRTR(root, api_key_file, activities_file, retrieval_date)
+    rtr.retrieve_and_log_data()
 
 if __name__ == "__main__":
     main()
