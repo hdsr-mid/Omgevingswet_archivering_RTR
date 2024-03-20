@@ -10,6 +10,8 @@ activities_file = f"data/{enviroment}_activiteiten_waterschapsverordening.txt"
 api_key_file    = f"code/{enviroment}_API_key.txt"
 retrieval_date  = datetime.now().strftime("%d-%m-%Y")
 
+print(str(sys.argv[2]))
+
 class CallRTR:
     def __init__(self, root_directory, api_key_file, activities_file, retrieval_date):
         self.root_directory = root_directory
