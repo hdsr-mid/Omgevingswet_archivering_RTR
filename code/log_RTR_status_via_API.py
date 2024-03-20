@@ -3,7 +3,7 @@ from datetime import datetime
 import requests
 import xlsxwriter
 
-root            = "G:\\DSO_Github"
+root            = "G:\\Github\waterschapsverordening_log_RTR_status"
 enviroment      = "Pre"
 api_key_file    = f"code/{enviroment}_API-key.txt"
 activities_file = f"data/{enviroment}_Activiteiten_Waterschapsverordening.txt"
