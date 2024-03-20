@@ -6,8 +6,8 @@ import sys
 
 root            = "G:\\Github\waterschapsverordening_log_RTR_status"
 enviroment      = str(sys.argv[1])
-activities_file = f"data/{enviroment}_Activiteiten_Waterschapsverordening.txt"
-api_key_file    = f"code/{enviroment}_API-key.txt"
+activities_file = f"data/{enviroment}_activiteiten_waterschapsverordening.txt"
+api_key_file    = f"code/{enviroment}_API_key.txt"
 retrieval_date  = datetime.now().strftime("%d-%m-%Y")
 
 class CallRTR:
@@ -38,7 +38,7 @@ class CallRTR:
         return urns
 
     def setup_excel(self):
-        document_name   = f"Waterschapsverordening_RTR_{enviroment}_status_{self.retrieval_date}.xlsx"
+        document_name   = f"waterschapsverordening_RTR_{enviroment}_status_{self.retrieval_date}.xlsx"
         self.workbook   = xlsxwriter.Workbook(f"log/{document_name}")
         self.worksheet  = self.workbook.add_worksheet()
         self.prepare_worksheet()
@@ -135,9 +135,9 @@ class CallRTR:
 
     @staticmethod
     def determine_base_url(env):
-        if env == "Prod":
+        if env == "prod":
             return "https://service.omgevingswet.overheid.nl/publiek/toepasbare-regels/api"
-        if env == "Pre":
+        if env == "pre":
             return "https://service.pre.omgevingswet.overheid.nl/publiek/toepasbare-regels/api"
         raise ValueError("Invalid environment specified")
 

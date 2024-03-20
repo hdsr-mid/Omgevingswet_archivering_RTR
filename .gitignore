@@ -5,5 +5,5 @@
 log/~$*
 
 # Exclude API-keys
-code/Pre_API-key.txt
-code/Prod_API-key.txt
+code/pre_API_key.txt
+code/prod_API_key.txt
