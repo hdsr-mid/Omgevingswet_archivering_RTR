@@ -44,7 +44,7 @@ class CallRTR:
         self.worksheet = self.workbook.add_worksheet()
         self.prepare_worksheet()
         
-    def get_format(self, color, bold, text_wrap):
+    def set_format(self, color, bold, text_wrap):
         return self.workbook.add_format({
             'bg_color': color,
             'text_wrap': text_wrap,
@@ -55,9 +55,6 @@ class CallRTR:
         })
 
     def prepare_worksheet(self):
-        header_format = self.get_format('#DDDDDD', True, True)
-        self.cell_format = self.get_format('white', False, False)
-        
         headers = [
             "Activiteit                   ",
             "Uri",
@@ -69,6 +66,9 @@ class CallRTR:
             "Wijziging Aanvraag vergunning",
             "Wijziging Informatie",
         ]
+        
+        header_format = self.set_format('#DDDDDD', True, True)
+        self.cell_format = self.set_format('white', False, False)
         self.worksheet.write_row('A1', headers, header_format)
         for i, header in enumerate(headers, 1):
             self.worksheet.set_column(i - 1, i - 1, max(10, len(header)) + 2)
@@ -152,7 +152,7 @@ class CallRTR:
         self.write_data_to_cells(row, data_to_write)
 
     @staticmethod
-    def set_color(index):
+    def set_green_intensity(index):
         color = 'white'
         if index < 1:
             color = '#00FF00'
@@ -172,8 +172,8 @@ class CallRTR:
             try:
                 content_date = datetime.strptime(content, "%d-%m-%Y %H:%M:%S")
                 difference = datetime.now() - content_date
-                color = self.set_color(difference.days)
-                cell_format = self.get_format(color, False, False)
+                color = self.set_green_intensity(difference.days)
+                cell_format = self.set_format(color, False, False)
                 self.worksheet.write(row - 1, col, content, cell_format)
             except ValueError:
                 # Use a predefined default format if the content isn't a date
