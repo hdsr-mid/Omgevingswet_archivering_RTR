@@ -5,7 +5,7 @@ import xlsxwriter
 import sys
 
 root            = "G:\\Github\waterschapsverordening_log_RTR_status"
-enviroment      = str(sys.argv[1] if len(sys.argv) > 1 else "prod")
+enviroment      = str(sys.argv[1]) if len(sys.argv) > 1 else "prod"
 activities_file = f"data/{enviroment}_activiteiten_waterschapsverordening.txt"
 api_key_file    = f"code/{enviroment}_API_key.txt"
 retrieval_date  = str(sys.argv[2]) if len(sys.argv) > 2 else datetime.now().strftime("%d-%m-%Y")
