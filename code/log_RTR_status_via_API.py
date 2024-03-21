@@ -1,20 +1,13 @@
 import os
 import sys
-
 from datetime import datetime
-
 import requests
-
 import xlsxwriter
 
-
 root = "G:\\Github\waterschapsverordening_log_RTR_status"
-
 enviroment = str(sys.argv[1]) if len(sys.argv) > 1 else "prod"
-
 activities_file = f"data/{enviroment}_activiteiten_waterschapsverordening.txt"
 api_key_file = f"code/{enviroment}_API_key.txt"
-
 retrieval_date = str(sys.argv[2]) if len(sys.argv) > 2 else datetime.now().strftime("%d-%m-%Y")
 
 
@@ -50,24 +43,21 @@ class CallRTR:
         self.workbook = xlsxwriter.Workbook(f"log/{document_name}")
         self.worksheet = self.workbook.add_worksheet()
         self.prepare_worksheet()
+        
+    def get_format(self, color, bold, text_wrap):
+        return self.workbook.add_format({
+            'bg_color': color,
+            'text_wrap': text_wrap,
+            'align': 'left',
+            'valign': 'top',
+            'bold': bold,
+            'border': True,
+        })
 
     def prepare_worksheet(self):
-        header_format = self.workbook.add_format({
-            'bg_color': '#DDDDDD',
-            'text_wrap': True,
-            'align': 'left',
-            'valign': 'top',
-            'bold': True,
-            'border': True,
-        })
-        self.cell_format = self.workbook.add_format({
-            'bg_color': 'white',
-            'text_wrap': False,
-            'align': 'left',
-            'valign': 'top',
-            'bold': False,
-            'border': True,
-        })
+        header_format = self.get_format('#DDDDDD', True, True)
+        self.cell_format = self.get_format('white', False, False)
+        
         headers = [
             "Activiteit                   ",
             "Uri",
@@ -161,18 +151,19 @@ class CallRTR:
         data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes
         self.write_data_to_cells(row, data_to_write)
 
-    def set_color(self, index):
+    @staticmethod
+    def set_color(index):
         color = 'white'
         if index < 1:
-            color = '#00FF00'  # Bright green
+            color = '#00FF00'
         elif index < 8:
-            color = '#32CD32'  # Lime Green
+            color = '#32CD32'
         elif index < 30:
-            color = '#98FB98'  # Pale Green
+            color = '#98FB98'
         elif index < 60:
-            color = '#90EE90'  # Light Green
+            color = '#90EE90'
         else:
-            color = '#F0FFF0'  # Honeydew
+            color = '#F0FFF0'
         return color
 
     def write_data_to_cells(self, row, data_to_write):
@@ -180,24 +171,14 @@ class CallRTR:
         for content in data_to_write:
             try:
                 content_date = datetime.strptime(content, "%d-%m-%Y %H:%M:%S")
-                difference = datetime.now() - content_date                
+                difference = datetime.now() - content_date
                 color = self.set_color(difference.days)
-                    
-                cell_format = self.workbook.add_format({
-                    'bg_color': color,
-                    'text_wrap': False,
-                    'align': 'left',
-                    'valign': 'top',
-                    'bold': False,
-                    'border': True,
-                })
-                
+                cell_format = self.get_format(color, False, False)
                 self.worksheet.write(row - 1, col, content, cell_format)
             except ValueError:
                 # Use a predefined default format if the content isn't a date
                 self.worksheet.write(row - 1, col, content, self.cell_format)
             col += 1
-
 
 
 
