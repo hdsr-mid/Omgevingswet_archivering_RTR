@@ -1,25 +1,33 @@
 import os
-from datetime import datetime
-import requests
-import xlsxwriter
 import sys
 
-root            = "G:\\Github\waterschapsverordening_log_RTR_status"
-enviroment      = str(sys.argv[1]) if len(sys.argv) > 1 else "prod"
+from datetime import datetime
+
+import requests
+
+import xlsxwriter
+
+
+root = "G:\\Github\waterschapsverordening_log_RTR_status"
+
+enviroment = str(sys.argv[1]) if len(sys.argv) > 1 else "prod"
+
 activities_file = f"data/{enviroment}_activiteiten_waterschapsverordening.txt"
-api_key_file    = f"code/{enviroment}_API_key.txt"
-retrieval_date  = str(sys.argv[2]) if len(sys.argv) > 2 else datetime.now().strftime("%d-%m-%Y")
+api_key_file = f"code/{enviroment}_API_key.txt"
+
+retrieval_date = str(sys.argv[2]) if len(sys.argv) > 2 else datetime.now().strftime("%d-%m-%Y")
+
 
 class CallRTR:
     def __init__(self, root_directory, api_key_file, activities_file, retrieval_date):
         self.root_directory = root_directory
         os.chdir(self.root_directory)
-        self.api_key          = self.load_api_key(api_key_file)
-        self.headers          = {'Accept': 'application/hal+json', 'x-api-key': self.api_key}
-        self.activities_file  = activities_file
-        self.retrieval_date   = retrieval_date
-        self.base_url         = self.determine_base_url(enviroment)
-        self.urns             = self.load_activities(activities_file)
+        self.api_key = self.load_api_key(api_key_file)
+        self.headers = {'Accept': 'application/hal+json', 'x-api-key': self.api_key}
+        self.activities_file = activities_file
+        self.retrieval_date = retrieval_date
+        self.base_url = self.determine_base_url(enviroment)
+        self.urns = self.load_activities(activities_file)
         self.setup_excel()
 
     @staticmethod
@@ -38,9 +46,9 @@ class CallRTR:
         return urns
 
     def setup_excel(self):
-        document_name   = f"waterschapsverordening_RTR_{enviroment}_status_{self.retrieval_date}.xlsx"
-        self.workbook   = xlsxwriter.Workbook(f"log/{document_name}")
-        self.worksheet  = self.workbook.add_worksheet()
+        document_name = f"waterschapsverordening_RTR_{enviroment}_status_{self.retrieval_date}.xlsx"
+        self.workbook = xlsxwriter.Workbook(f"log/{document_name}")
+        self.worksheet = self.workbook.add_worksheet()
         self.prepare_worksheet()
 
     def prepare_worksheet(self):
@@ -151,9 +159,43 @@ class CallRTR:
         werkzaamheden = self.extract_werkzaamheden(data)
         changes = self.fetch_and_process_changes(session, data)
         data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes
-        self.worksheet.write_row(row - 1, 0, data_to_write, self.cell_format)
+        self.write_data_to_cells(row, data_to_write)
 
-        
+    def write_data_to_cells(self, row, data_to_write):
+        col = 0
+        for content in data_to_write:
+            try:
+                content_date = datetime.strptime(content, "%d-%m-%Y %H:%M:%S")
+                difference = datetime.now() - content_date
+                days = difference.days
+                
+                if days < 1:
+                    color = '#00FF00'  # Bright green
+                elif days < 8:
+                    color = '#32CD32'  # Lime Green
+                elif days < 31:
+                    color = '#98FB98'  # Pale Green
+                elif days < 61:
+                    color = '#90EE90'  # Light Green
+                else:
+                    color = '#F0FFF0'  # Honeydew, almost white but still green
+                    
+                cell_format = self.workbook.add_format({
+                    'bg_color': color,
+                    'text_wrap': False,
+                    'align': 'left',
+                    'valign': 'top',
+                    'bold': False,
+                    'border': True,
+                })
+                self.worksheet.write(row - 1, col, content, cell_format)
+            except ValueError:
+                # Use a predefined default format if the content isn't a date
+                self.worksheet.write(row - 1, col, content, self.cell_format)
+            col += 1
+
+
+
 
 def main():
     rtr = CallRTR(root, api_key_file, activities_file, retrieval_date)
