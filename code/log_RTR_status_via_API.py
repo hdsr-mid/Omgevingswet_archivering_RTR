@@ -1,24 +1,26 @@
 import os
+import sys
 from datetime import datetime
 import requests
 import xlsxwriter
 
-root            = "G:\\Github\waterschapsverordening_log_RTR_status"
-enviroment      = "Pre"
-api_key_file    = f"code/{enviroment}_API-key.txt"
-activities_file = f"data/{enviroment}_Activiteiten_Waterschapsverordening.txt"
-retrieval_date  = datetime.now().strftime("%d-%m-%Y")
+root = "G:\\Github\waterschapsverordening_log_RTR_status"
+enviroment = str(sys.argv[1]) if len(sys.argv) > 1 else "prod"
+activities_file = f"data/{enviroment}_activiteiten_waterschapsverordening.txt"
+api_key_file = f"code/{enviroment}_API_key.txt"
+retrieval_date = str(sys.argv[2]) if len(sys.argv) > 2 else datetime.now().strftime("%d-%m-%Y")
+
 
 class CallRTR:
     def __init__(self, root_directory, api_key_file, activities_file, retrieval_date):
         self.root_directory = root_directory
         os.chdir(self.root_directory)
-        self.api_key          = self.load_api_key(api_key_file)
-        self.headers          = {'Accept': 'application/hal+json', 'x-api-key': self.api_key}
-        self.activities_file  = activities_file
-        self.retrieval_date   = retrieval_date
-        self.base_url         = self.determine_base_url(enviroment)
-        self.urns             = self.load_activities(activities_file)
+        self.api_key = self.load_api_key(api_key_file)
+        self.headers = {'Accept': 'application/hal+json', 'x-api-key': self.api_key}
+        self.activities_file = activities_file
+        self.retrieval_date = retrieval_date
+        self.base_url = self.determine_base_url(enviroment)
+        self.urns = self.load_activities(activities_file)
         self.setup_excel()
 
     @staticmethod
@@ -37,28 +39,22 @@ class CallRTR:
         return urns
 
     def setup_excel(self):
-        document_name   = f"Waterschapsverordening_RTR_{enviroment}_status_{self.retrieval_date}.xlsx"
-        self.workbook   = xlsxwriter.Workbook(f"log/{document_name}")
-        self.worksheet  = self.workbook.add_worksheet()
+        document_name = f"waterschapsverordening_RTR_{enviroment}_status_{self.retrieval_date}.xlsx"
+        self.workbook = xlsxwriter.Workbook(f"log/{document_name}")
+        self.worksheet = self.workbook.add_worksheet()
         self.prepare_worksheet()
+        
+    def set_format(self, color, bold, text_wrap):
+        return self.workbook.add_format({
+            'bg_color': color,
+            'text_wrap': text_wrap,
+            'align': 'left',
+            'valign': 'top',
+            'bold': bold,
+            'border': True,
+        })
 
     def prepare_worksheet(self):
-        header_format = self.workbook.add_format({
-            'bg_color': '#DDDDDD',
-            'text_wrap': True,
-            'align': 'left',
-            'valign': 'top',
-            'bold': True,
-            'border': True,
-        })
-        self.cell_format = self.workbook.add_format({
-            'bg_color': 'white',
-            'text_wrap': False,
-            'align': 'left',
-            'valign': 'top',
-            'bold': False,
-            'border': True,
-        })
         headers = [
             "Activiteit                   ",
             "Uri",
@@ -70,6 +66,9 @@ class CallRTR:
             "Wijziging Aanvraag vergunning",
             "Wijziging Informatie",
         ]
+        
+        header_format = self.set_format('#DDDDDD', True, True)
+        self.cell_format = self.set_format('white', False, False)
         self.worksheet.write_row('A1', headers, header_format)
         for i, header in enumerate(headers, 1):
             self.worksheet.set_column(i - 1, i - 1, max(10, len(header)) + 2)
@@ -134,9 +133,9 @@ class CallRTR:
 
     @staticmethod
     def determine_base_url(env):
-        if env == "Prod":
+        if env == "prod":
             return "https://service.omgevingswet.overheid.nl/publiek/toepasbare-regels/api"
-        if env == "Pre":
+        if env == "pre":
             return "https://service.pre.omgevingswet.overheid.nl/publiek/toepasbare-regels/api"
         raise ValueError("Invalid environment specified")
 
@@ -150,9 +149,38 @@ class CallRTR:
         werkzaamheden = self.extract_werkzaamheden(data)
         changes = self.fetch_and_process_changes(session, data)
         data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes
-        self.worksheet.write_row(row - 1, 0, data_to_write, self.cell_format)
+        self.write_data_to_cells(row, data_to_write)
 
-        
+    @staticmethod
+    def set_green_intensity(index):
+        color = 'white'
+        if index < 1:
+            color = '#00FF00'
+        elif index < 8:
+            color = '#32CD32'
+        elif index < 30:
+            color = '#98FB98'
+        elif index < 60:
+            color = '#90EE90'
+        else:
+            color = '#F0FFF0'
+        return color
+
+    def write_data_to_cells(self, row, data_to_write):
+        col = 0
+        for content in data_to_write:
+            try:
+                content_date = datetime.strptime(content, "%d-%m-%Y %H:%M:%S")
+                difference = datetime.now() - content_date
+                color = self.set_green_intensity(difference.days)
+                cell_format = self.set_format(color, False, False)
+                self.worksheet.write(row - 1, col, content, cell_format)
+            except ValueError:
+                # Use a predefined default format if the content isn't a date
+                self.worksheet.write(row - 1, col, content, self.cell_format)
+            col += 1
+
+
 
 def main():
     rtr = CallRTR(root, api_key_file, activities_file, retrieval_date)
