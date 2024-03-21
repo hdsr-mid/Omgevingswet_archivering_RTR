@@ -161,24 +161,27 @@ class CallRTR:
         data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes
         self.write_data_to_cells(row, data_to_write)
 
+    def set_color(self, index):
+        color = 'white'
+        if index < 1:
+            color = '#00FF00'  # Bright green
+        elif index < 8:
+            color = '#32CD32'  # Lime Green
+        elif index < 30:
+            color = '#98FB98'  # Pale Green
+        elif index < 60:
+            color = '#90EE90'  # Light Green
+        else:
+            color = '#F0FFF0'  # Honeydew
+        return color
+
     def write_data_to_cells(self, row, data_to_write):
         col = 0
         for content in data_to_write:
             try:
                 content_date = datetime.strptime(content, "%d-%m-%Y %H:%M:%S")
-                difference = datetime.now() - content_date
-                days = difference.days
-                
-                if days < 1:
-                    color = '#00FF00'  # Bright green
-                elif days < 8:
-                    color = '#32CD32'  # Lime Green
-                elif days < 31:
-                    color = '#98FB98'  # Pale Green
-                elif days < 61:
-                    color = '#90EE90'  # Light Green
-                else:
-                    color = '#F0FFF0'  # Honeydew, almost white but still green
+                difference = datetime.now() - content_date                
+                color = self.set_color(difference.days)
                     
                 cell_format = self.workbook.add_format({
                     'bg_color': color,
@@ -188,6 +191,7 @@ class CallRTR:
                     'bold': False,
                     'border': True,
                 })
+                
                 self.worksheet.write(row - 1, col, content, cell_format)
             except ValueError:
                 # Use a predefined default format if the content isn't a date
