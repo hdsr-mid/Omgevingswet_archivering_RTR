@@ -1,4 +1,4 @@
-Python script om de status van de Registratie Toepasbare Regels naar .xlsx formaat te schrijven. 
+Dit script verzamelt en analyseert gegevens over waterschapsverordeningen door vanuit een externe API de status van diverse activiteiten op te halen, afhankelijk van een gespecificeerde omgeving ('prod' of 'pre') en datum. Het laadt een API-sleutel en een activiteitenlijst uit bestanden, maakt API-verzoeken om informatie over elke activiteit te verzamelen, en logt deze gegevens in een dynamisch gegenereerd Excel-bestand. Dit bestand bevat gedetailleerde informatie over de activiteiten, waaronder de laatste wijzigingsdatums, en gebruikt celkleuring om de recentheid van de gegevens visueel aan te duiden. Het resultaat is een uitgebreid en visueel inzichtelijk document dat dient als een overzicht van de huidige stand van zaken binnen waterschapsverordeningen, nuttig voor zowel analyse als het volgen van veranderingen over tijd.
 
 - Voeg de productie en pre API-keys toe aan de files in de volgende folder, deze keys kun je aanvragen bij [Iplo](https://aandeslagmetdeomgevingswet.nl/ontwikkelaarsportaal/api-register/api/omgevingsdocument-toepasbaar-opvragen/).
 ```
