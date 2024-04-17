@@ -4,7 +4,7 @@ from datetime import datetime
 import requests
 import xlsxwriter
 
-root = "G:\\Github\waterschapsverordening_log_RTR_status"
+root = "D:\\HDSR\Github\waterschapsverordening_log_RTR_status"
 enviroment = str(sys.argv[1]) if len(sys.argv) > 1 else "prod"
 activities_file = f"data/{enviroment}_activiteiten_waterschapsverordening.txt"
 api_key_file = f"code/{enviroment}_API_key.txt"
@@ -125,6 +125,12 @@ class CallRTR:
         response = session.get(url, headers=self.headers)
         if response.ok:
             data = response.json()
+
+
+            newurl = self.call_some_url(self)
+            response2 = session.get(newurl)
+            print( response2)
+
             embedded = data.get('_embedded', {})
             applicable_rules = embedded.get('toepasbareRegels', [])
             if applicable_rules:
@@ -144,6 +150,10 @@ class CallRTR:
 
     def compose_regel_beheer_object_url(self, functional_structure_reference):
         return f"{self.base_url}/toepasbareregelsuitvoerengegevens/v1/toepasbareRegels?functioneleStructuurRef={functional_structure_reference}&datum={self.retrieval_date}"
+
+    def call_some_url(self):
+        sttrstring = f"https://service.omgevingswet.overheid.nl/publiek/toepasbare-regels/api/toepasbareregelsuitvoerengegevens/v1/toepasbareRegels/70356/sttrBestand"
+        return sttrstring
 
     def log_activity_data(self, session, row, name, uri, activity_group, rule_reference, data):
         werkzaamheden = self.extract_werkzaamheden(data)
@@ -176,7 +186,6 @@ class CallRTR:
                 cell_format = self.set_format(color, False, False)
                 self.worksheet.write(row - 1, col, content, cell_format)
             except ValueError:
-                # Use a predefined default format if the content isn't a date
                 self.worksheet.write(row - 1, col, content, self.cell_format)
             col += 1
 
