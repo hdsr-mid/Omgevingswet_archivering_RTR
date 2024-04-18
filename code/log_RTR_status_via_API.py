@@ -24,8 +24,8 @@ class CallRTR:
                             help='Environment setting: prod (default) or pre.')
         parser.add_argument('--date', type=str, default=datetime.now().strftime("%d-%m-%Y"),
                             help='Date in the format dd-mm-yyyy, default is today\'s date.')
-        parser.add_argument('--xml', action='store_true',
-                            help='Flag to log sttr files if present.')
+        parser.add_argument('--sttr', action='store_true',
+                            help='Flag to log sttr files in .xml if present.')
         args = parser.parse_args()
         return args
 
@@ -218,7 +218,7 @@ def main():
     rtr = CallRTR()
     rtr.log_activities_and_meta_data()
 
-    if rtr.args.xml:
+    if rtr.args.sttr:
         rtr.log_sttr_files()
 
 if __name__ == "__main__":
