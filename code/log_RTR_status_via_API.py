@@ -3,13 +3,25 @@ import sys
 from datetime import datetime
 import requests
 import xlsxwriter
+import argparse
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Process some environment settings and actions.")
+    parser.add_argument('--env', type=str, default="prod", choices=['prod', 'pre'],
+                        help='Environment setting: prod (default) or pre.')
+    parser.add_argument('--date', type=str, default=datetime.now().strftime("%d-%m-%Y"),
+                        help='Date in the format dd-mm-yyyy, default is today\'s date.')
+    parser.add_argument('--xml', action='store_true',
+                        help='Flag to log sttr files if present.')
+    args = parser.parse_args()
+    return args
 
 root = "D:\\HDSR\Github\waterschapsverordening_log_RTR_status"
-enviroment = str(sys.argv[1]) if len(sys.argv) > 1 else "prod"
-activities_file = f"data/{enviroment}_activiteiten_waterschapsverordening.txt"
-api_key_file = f"code/{enviroment}_API_key.txt"
-retrieval_date = str(sys.argv[2]) if len(sys.argv) > 2 else datetime.now().strftime("%d-%m-%Y")
-
+args = parse_arguments()
+environment = args.env
+retrieval_date = args.date
+activities_file = f"data/{environment}_activiteiten_waterschapsverordening.txt"
+api_key_file = f"code/{environment}_API_key.txt"
 
 class CallRTR:
     def __init__(self, root_directory, api_key_file, activities_file, retrieval_date):
@@ -19,7 +31,7 @@ class CallRTR:
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
         self.activities_file = activities_file
         self.retrieval_date = retrieval_date
-        self.base_url = self.determine_base_url(enviroment)
+        self.base_url = self.determine_base_url(environment)
         self.urns = self.load_activities(activities_file)
         self.sttr_files = []
         self.setup_excel()
@@ -40,7 +52,7 @@ class CallRTR:
         return urns
 
     def setup_excel(self):
-        document_name = f"waterschapsverordening_RTR_{enviroment}_status_{self.retrieval_date}.xlsx"
+        document_name = f"waterschapsverordening_RTR_{environment}_status_{self.retrieval_date}.xlsx"
         self.workbook = xlsxwriter.Workbook(f"log/{document_name}")
         self.worksheet = self.workbook.add_worksheet()
         self.prepare_worksheet()
@@ -74,7 +86,7 @@ class CallRTR:
         for i, header in enumerate(headers, 1):
             self.worksheet.set_column(i - 1, i - 1, max(10, len(header)) + 2)
 
-    def retrieve_and_log_data(self):
+    def log_activities_and_meta_data(self):
         with requests.Session() as session:
             for row, activity in enumerate(self.urns, 2):
                 self.process_activity(session, activity, row)
@@ -126,7 +138,7 @@ class CallRTR:
             sttr_bestand_href = data['_embedded']['toepasbareRegels'][0]['_links']['sttrBestand']['href']
             self.sttr_files.append(sttr_bestand_href)
         except KeyError as e:
-            print(f"Data missing key: {e}")
+            print(f"Data missing from {data} key: {e}")
 
     def fetch_last_changed_date(self, session, functional_structure_reference):
         url = self.compose_regel_beheer_object_url(functional_structure_reference)
@@ -189,7 +201,7 @@ class CallRTR:
                 self.worksheet.write(row - 1, col, content, self.cell_format)
             col += 1
 
-    def get_sttr_files(self):
+    def log_sttr_files(self):
         for url in self.sttr_files:
             identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
             response = requests.get(url, headers=self.headers)
@@ -203,8 +215,10 @@ class CallRTR:
 
 def main():
     rtr = CallRTR(root, api_key_file, activities_file, retrieval_date)
-    rtr.retrieve_and_log_data()
-    rtr.get_sttr_files()
+    rtr.log_activities_and_meta_data()
+
+    if args.xml:
+        rtr.log_sttr_files()
 
 if __name__ == "__main__":
     main()
