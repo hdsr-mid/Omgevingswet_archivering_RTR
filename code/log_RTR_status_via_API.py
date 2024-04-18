@@ -16,11 +16,12 @@ class CallRTR:
         self.root_directory = root_directory
         os.chdir(self.root_directory)
         self.api_key = self.load_api_key(api_key_file)
-        self.headers = {'Accept': 'application/hal+json', 'x-api-key': self.api_key}
+        self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
         self.activities_file = activities_file
         self.retrieval_date = retrieval_date
         self.base_url = self.determine_base_url(enviroment)
         self.urns = self.load_activities(activities_file)
+        self.sttr_files = []
         self.setup_excel()
 
     @staticmethod
@@ -119,17 +120,20 @@ class CallRTR:
                     )
                     changes[index] = lastChanged
         return changes
+    
+    def append_sttr_file(self, data):
+        try:
+            sttr_bestand_href = data['_embedded']['toepasbareRegels'][0]['_links']['sttrBestand']['href']
+            self.sttr_files.append(sttr_bestand_href)
+        except KeyError as e:
+            print(f"Data missing key: {e}")
 
     def fetch_last_changed_date(self, session, functional_structure_reference):
         url = self.compose_regel_beheer_object_url(functional_structure_reference)
         response = session.get(url, headers=self.headers)
         if response.ok:
             data = response.json()
-
-
-            newurl = self.call_some_url(self)
-            response2 = session.get(newurl)
-            print( response2)
+            self.append_sttr_file(data)
 
             embedded = data.get('_embedded', {})
             applicable_rules = embedded.get('toepasbareRegels', [])
@@ -150,10 +154,6 @@ class CallRTR:
 
     def compose_regel_beheer_object_url(self, functional_structure_reference):
         return f"{self.base_url}/toepasbareregelsuitvoerengegevens/v1/toepasbareRegels?functioneleStructuurRef={functional_structure_reference}&datum={self.retrieval_date}"
-
-    def call_some_url(self):
-        sttrstring = f"https://service.omgevingswet.overheid.nl/publiek/toepasbare-regels/api/toepasbareregelsuitvoerengegevens/v1/toepasbareRegels/70356/sttrBestand"
-        return sttrstring
 
     def log_activity_data(self, session, row, name, uri, activity_group, rule_reference, data):
         werkzaamheden = self.extract_werkzaamheden(data)
@@ -189,11 +189,22 @@ class CallRTR:
                 self.worksheet.write(row - 1, col, content, self.cell_format)
             col += 1
 
-
+    def get_sttr_files(self):
+        for url in self.sttr_files:
+            identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
+            response = requests.get(url, headers=self.headers)
+            
+            if response.status_code == 200:
+                print("ok")
+                with open(f'log/sttr/sttr_file_{identifier}.xml', 'w', encoding='utf-8') as file:
+                    file.write(response.text)
+            else:
+                print(f"Failed to download data from {url}, status code: {response.status_code}")
 
 def main():
     rtr = CallRTR(root, api_key_file, activities_file, retrieval_date)
     rtr.retrieve_and_log_data()
+    rtr.get_sttr_files()
 
 if __name__ == "__main__":
     main()
