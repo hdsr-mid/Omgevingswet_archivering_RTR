@@ -132,7 +132,7 @@ class CallRTR:
             self.sttr_files.append(sttr_bestand_href)
         except KeyError as e:
             identifier = self.extract_identifier(data)
-            print(f"Data missing key: '{e}'. Context: {identifier}")
+            print(f"Data missing key: '{e}'. Regelbeheerobject: {identifier}")
 
     def extract_identifier(self, data):
         try:
