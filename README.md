@@ -1,5 +1,11 @@
-Dit script verzamelt en analyseert gegevens over waterschapsverordeningen door vanuit een externe API de status van diverse activiteiten op te halen, afhankelijk van een gespecificeerde omgeving ('prod' of 'pre') en datum. Het laadt een API-sleutel en een activiteitenlijst uit bestanden, maakt API-verzoeken om informatie over elke activiteit te verzamelen, en logt deze gegevens in een dynamisch gegenereerd Excel-bestand. Dit bestand bevat gedetailleerde informatie over de activiteiten, waaronder de laatste wijzigingsdatums, en gebruikt celkleuring om de recentheid van de gegevens visueel aan te duiden. Het resultaat is een uitgebreid en visueel inzichtelijk document dat dient als een overzicht van de huidige stand van zaken binnen waterschapsverordeningen, nuttig voor zowel analyse als het volgen van veranderingen over tijd.
+Via dit script kunnen gegevens uit de RTR worden opgevraagd en lokaal worden opgeslagen. Denk daarbij aan het genereren van een Excel overzicht van activiteiten en hun bijbehorende data en DMN logica. 
 
+Flags
+--env prod/pre
+--date 01-01-2024
+--sttr 
+
+Setup
 - Voeg de productie en pre API-keys toe aan de files in de volgende folder, deze keys kun je aanvragen bij [Iplo](https://aandeslagmetdeomgevingswet.nl/ontwikkelaarsportaal/api-register/api/omgevingsdocument-toepasbaar-opvragen/).
 ```
 code/prod_API_key.txt
