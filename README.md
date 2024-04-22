@@ -1,9 +1,11 @@
 Via dit script kunnen gegevens uit de RTR worden opgevraagd en lokaal worden opgeslagen. Denk daarbij aan het genereren van een Excel overzicht van activiteiten en hun bijbehorende data en DMN logica. 
 
 Flags
+```
 --env prod/pre
 --date 01-01-2024
---sttr 
+--sttr
+```
 
 Setup
 - Voeg de productie en pre API-keys toe aan de files in de volgende folder, deze keys kun je aanvragen bij [Iplo](https://aandeslagmetdeomgevingswet.nl/ontwikkelaarsportaal/api-register/api/omgevingsdocument-toepasbaar-opvragen/).
