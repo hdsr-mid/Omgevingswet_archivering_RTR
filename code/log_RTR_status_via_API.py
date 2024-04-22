@@ -5,7 +5,7 @@ import xlsxwriter
 import argparse
 import urllib.parse
 
-class CallRTR:
+class RTR:
     def __init__(self):
         #os.chdir("D:\\HDSR\Github\waterschapsverordening_log_RTR_status")      # home
         os.chdir("G:\\Github\waterschapsverordening_log_RTR_status")            # work
@@ -14,7 +14,7 @@ class CallRTR:
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
         self.base_url = self.determine_base_url(self.args.env)
         self.urns = self.load_activities(f"data/{self.args.env}_activiteiten_waterschapsverordening.txt")
-        self.sttr_file_url = {}
+        self.sttr_url_by_name = {}
         self.setup_excel()
 
     @staticmethod
@@ -79,7 +79,7 @@ class CallRTR:
         for i, header in enumerate(headers, 1):
             self.worksheet.set_column(i - 1, i - 1, max(10, len(header)) + 2)
 
-    def log_activities_and_meta_data(self):
+    def log_activities(self):
         with requests.Session() as session:
             for row, activity in enumerate(self.urns, 2):
                 self.process_activity(session, activity, row)
@@ -157,7 +157,7 @@ class CallRTR:
             
             if regelbeheerobject_type != "null":
                 regelbeheerobject_name = urn_name + "_" + regelbeheerobject_type.replace(" ", "_")
-                self.sttr_file_url[regelbeheerobject_name] = sttr_bestand_href
+                self.sttr_url_by_name[regelbeheerobject_name] = sttr_bestand_href
             
         except KeyError as e:
             identifier = self.extract_identifier(data)
@@ -221,7 +221,7 @@ class CallRTR:
             col += 1
 
     def log_sttr_files(self):
-        for key, url in self.sttr_file_url.items():
+        for key, url in self.sttr_url_by_name.items():
             identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
             response = requests.get(url, headers=self.headers)
                          
@@ -232,8 +232,8 @@ class CallRTR:
                 print(f"Failed to download data from {url}, status code: {response.status_code}")
 
 def main():
-    rtr = CallRTR()
-    rtr.log_activities_and_meta_data()
+    rtr = RTR()
+    rtr.log_activities()
 
     if rtr.args.sttr:
         rtr.log_sttr_files()
