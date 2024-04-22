@@ -112,8 +112,8 @@ class CallRTR:
 
     def fetch_and_process_changes(self, session, data):
         urn_name = data["urn"].split(".")[-1]
-               
         changes = ["", "", "", ""]
+        
         if "regelBeheerObjecten" in data:
             for object in data["regelBeheerObjecten"]:
                 object_type = object["typering"]
@@ -130,6 +130,26 @@ class CallRTR:
                     )
                     changes[index] = lastChanged
         return changes
+    
+    def process_regelbeheerobject(self, session, urn_name, object_type, functional_structure_reference):
+        regelbeheerobject_exists = object_type != "null"
+        if regelbeheerobject_exists:        
+            url = self.compose_regel_beheer_object_url(functional_structure_reference)
+            response = session.get(url, headers=self.headers)
+
+            if response.ok:
+                data = response.json()
+                self.append_sttr_file(urn_name, object_type, data)
+                last_changed = self.get_last_change_date(data)
+                return last_changed
+
+    def get_last_change_date(self, data):
+        embedded = data.get('_embedded', {})
+        applicable_rules = embedded.get('toepasbareRegels', [])
+        if applicable_rules:
+            return applicable_rules[0].get("laatsteWijzigingDatum", "")
+        else:
+            return ""
     
     def append_sttr_file(self, urn_name, regelbeheerobject_type, data):
         try:
@@ -150,23 +170,6 @@ class CallRTR:
             return functionele_structuur_ref.split('/')[-1]
         except Exception:
             return "Unknown"  
-
-    def process_regelbeheerobject(self, session, urn_name, object_type, functional_structure_reference):
-        url = self.compose_regel_beheer_object_url(functional_structure_reference)
-        response = session.get(url, headers=self.headers)
-        if response.ok:
-            data = response.json()
-            self.append_sttr_file(urn_name, object_type, data)
-            last_changed = self.get_last_change_date(data)
-            return last_changed
-
-    def get_last_change_date(self, data):
-        embedded = data.get('_embedded', {})
-        applicable_rules = embedded.get('toepasbareRegels', [])
-        if applicable_rules:
-            return applicable_rules[0].get("laatsteWijzigingDatum", "")
-        else:
-            return ""
 
     @staticmethod
     def determine_base_url(env):
@@ -223,7 +226,7 @@ class CallRTR:
             response = requests.get(url, headers=self.headers)
                          
             if response.status_code == 200:
-                with open(f'log/sttr/sttr_file_{identifier}_{key}.xml', 'w', encoding='utf-8') as file:
+                with open(f'log/STTR_RegelBeheerObjecten/STTR_{identifier}_{key}.xml', 'w', encoding='utf-8') as file:
                     file.write(response.text)
             else:
                 print(f"Failed to download data from {url}, status code: {response.status_code}")
