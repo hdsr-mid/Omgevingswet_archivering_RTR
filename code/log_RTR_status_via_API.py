@@ -1,5 +1,4 @@
 import os
-#import sys
 from datetime import datetime
 import requests
 import xlsxwriter
@@ -8,13 +7,14 @@ import urllib.parse
 
 class CallRTR:
     def __init__(self):
-        os.chdir("D:\\HDSR\Github\waterschapsverordening_log_RTR_status")
+        #os.chdir("D:\\HDSR\Github\waterschapsverordening_log_RTR_status")      # home
+        os.chdir("G:\\Github\waterschapsverordening_log_RTR_status")            # work
         self.args = self.parse_arguments()
         self.api_key = self.load_api_key(f"code/{self.args.env}_API_key.txt")
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
         self.base_url = self.determine_base_url(self.args.env)
         self.urns = self.load_activities(f"data/{self.args.env}_activiteiten_waterschapsverordening.txt")
-        self.sttr_files = []
+        self.sttr_file_url = {}
         self.setup_excel()
 
     @staticmethod
@@ -111,14 +111,19 @@ class CallRTR:
         return [', '.join(werkzaamheden_list)] if werkzaamheden_list else [""]
 
     def fetch_and_process_changes(self, session, data):
+        urn_name = data["urn"].split(".")[-1]
+               
         changes = ["", "", "", ""]
         if "regelBeheerObjecten" in data:
             for object in data["regelBeheerObjecten"]:
                 object_type = object["typering"]
                 if object_type == "Indieningsvereisten":
                     object_type = object["toestemming"]["waarde"]
+                else:
+                    object_type = "null"
+
                 functional_structure_reference = object["functioneleStructuurRef"]
-                lastChanged = self.fetch_last_changed_date(session, functional_structure_reference)
+                lastChanged = self.process_regelbeheerobject(session, urn_name, object_type, functional_structure_reference)
                 if object_type in {"Conclusie", "Melding", "Aanvraag vergunning", "Informatie"}:
                     index = ["Conclusie", "Melding", "Aanvraag vergunning", "Informatie"].index(
                         object_type
@@ -126,10 +131,14 @@ class CallRTR:
                     changes[index] = lastChanged
         return changes
     
-    def append_sttr_file(self, data):
+    def append_sttr_file(self, urn_name, regelbeheerobject_type, data):
         try:
             sttr_bestand_href = data['_embedded']['toepasbareRegels'][0]['_links']['sttrBestand']['href']
-            self.sttr_files.append(sttr_bestand_href)
+            
+            if regelbeheerobject_type != "null":
+                regelbeheerobject_name = urn_name + "_" + regelbeheerobject_type.replace(" ", "_")
+                self.sttr_file_url[regelbeheerobject_name] = sttr_bestand_href
+            
         except KeyError as e:
             identifier = self.extract_identifier(data)
             print(f"Data missing key: '{e}'. Regelbeheerobject: {identifier}")
@@ -142,18 +151,22 @@ class CallRTR:
         except Exception:
             return "Unknown"  
 
-    def fetch_last_changed_date(self, session, functional_structure_reference):
+    def process_regelbeheerobject(self, session, urn_name, object_type, functional_structure_reference):
         url = self.compose_regel_beheer_object_url(functional_structure_reference)
         response = session.get(url, headers=self.headers)
         if response.ok:
             data = response.json()
-            self.append_sttr_file(data)
+            self.append_sttr_file(urn_name, object_type, data)
+            last_changed = self.get_last_change_date(data)
+            return last_changed
 
-            embedded = data.get('_embedded', {})
-            applicable_rules = embedded.get('toepasbareRegels', [])
-            if applicable_rules:
-                return applicable_rules[0].get("laatsteWijzigingDatum", "")
-        return ""
+    def get_last_change_date(self, data):
+        embedded = data.get('_embedded', {})
+        applicable_rules = embedded.get('toepasbareRegels', [])
+        if applicable_rules:
+            return applicable_rules[0].get("laatsteWijzigingDatum", "")
+        else:
+            return ""
 
     @staticmethod
     def determine_base_url(env):
@@ -171,6 +184,7 @@ class CallRTR:
 
     def log_activity_data(self, session, row, name, uri, activity_group, rule_reference, data):
         werkzaamheden = self.extract_werkzaamheden(data)
+        
         changes = self.fetch_and_process_changes(session, data)
         data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes
         self.write_data_to_cells(row, data_to_write)
@@ -204,12 +218,12 @@ class CallRTR:
             col += 1
 
     def log_sttr_files(self):
-        for url in self.sttr_files:
+        for key, url in self.sttr_file_url.items():
             identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
             response = requests.get(url, headers=self.headers)
-            
+                         
             if response.status_code == 200:
-                with open(f'log/sttr/sttr_file_{identifier}.xml', 'w', encoding='utf-8') as file:
+                with open(f'log/sttr/sttr_file_{identifier}_{key}.xml', 'w', encoding='utf-8') as file:
                     file.write(response.text)
             else:
                 print(f"Failed to download data from {url}, status code: {response.status_code}")
