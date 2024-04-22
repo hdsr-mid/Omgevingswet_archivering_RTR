@@ -1,10 +1,18 @@
 Via dit script kunnen gegevens uit de RTR worden opgevraagd en lokaal worden opgeslagen. Denk daarbij aan het genereren van een Excel overzicht van activiteiten en hun bijbehorende data en DMN logica. 
 
+Gebruik
+```
+python.exe code/log_RTR_status_via_API.py
+```
+
 Flags
 ```
---env prod/pre
---date 01-01-2024
---sttr
+--env prod/pre        # Selecteer de juiste omgeving,               standaard: prod
+--date 01-01-2024     # Datum voor het tijdstip van de RTR,         standaard: vandaag
+--sttr                # Sla per regelbeheerobject de DMN logica op  standaard: uit
+
+voorbeeld: python.exe code/log_RTR_status_via_API.py --env pre --date 03-03-2024
+voorbeeld: python.exe code/log_RTR_status_via_API.py --env prod --date 12-04-2024 --sttr
 ```
 
 Setup
