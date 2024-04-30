@@ -1,21 +1,21 @@
 import os
 from datetime import datetime
 import requests
-import xlsxwriter
 import argparse
 import urllib.parse
 
+from excel import ExcelHandler
+
 class RTR:
     def __init__(self):
-        os.chdir("D:\\HDSR\Github\waterschapsverordening_log_RTR_status")      # home
-        #os.chdir("G:\\Github\waterschapsverordening_log_RTR_status")            # work
+        self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  
         self.args = self.parse_arguments()
-        self.api_key = self.load_api_key(f"code/{self.args.env}_API_key.txt")
+        self.api_key = self.load_api_key(os.path.join(self.base_dir, 'code', f"{self.args.env}_API_key.txt"))
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
         self.base_url = self.determine_base_url(self.args.env)
-        self.urns = self.load_activities(f"data/{self.args.env}_activiteiten_waterschapsverordening.txt")
+        self.urns = self.load_activities(os.path.join(self.base_dir, 'data', f"{self.args.env}_activiteiten_waterschapsverordening.txt"))
         self.sttr_url_by_name = {}
-        self.setup_excel()
+        self.excel_handler = ExcelHandler(self.base_dir, self.args.env, self.args.date)
 
     @staticmethod
     def parse_arguments():
@@ -44,46 +44,13 @@ class RTR:
                     urns.append(activity)
         return urns
 
-    def setup_excel(self):
-        document_name = f"waterschapsverordening_RTR_{self.args.env}_status_{self.args.date}.xlsx"
-        self.workbook = xlsxwriter.Workbook(f"log/{document_name}")
-        self.worksheet = self.workbook.add_worksheet()
-        self.prepare_worksheet()
-        
-    def set_format(self, color, bold, text_wrap):
-        return self.workbook.add_format({
-            'bg_color': color,
-            'text_wrap': text_wrap,
-            'align': 'left',
-            'valign': 'top',
-            'bold': bold,
-            'border': True,
-        })
-
-    def prepare_worksheet(self):
-        headers = [
-            "Activiteit                   ",
-            "Uri",
-            "Activiteiten Groep",
-            "Regel",
-            "Werkzaamheden",
-            "Wijziging Conclusie",
-            "Wijziging Melding",
-            "Wijziging Aanvraag vergunning",
-            "Wijziging Informatie",
-        ]
-        
-        header_format = self.set_format('#DDDDDD', True, True)
-        self.cell_format = self.set_format('white', False, False)
-        self.worksheet.write_row('A1', headers, header_format)
-        for i, header in enumerate(headers, 1):
-            self.worksheet.set_column(i - 1, i - 1, max(10, len(header)) + 2)
-
     def log_activities(self):
         with requests.Session() as session:
             for row, activity in enumerate(self.urns, 2):
                 self.process_activity(session, activity, row)
-        self.workbook.close()
+            if self.args.sttr: 
+                self.log_sttr_files(session)
+        self.excel_handler.close_workbook()
 
     def process_activity(self, session, activity, row):
         name, _, uri, _, activity_group, rule_reference, _ = activity
@@ -126,25 +93,20 @@ class RTR:
         object_type = object["typering"]
         if object_type == "Indieningsvereisten":
             object_type = object["toestemming"]["waarde"]
-        else:
-            object_type = "null"
 
         functional_structure_reference = object["functioneleStructuurRef"]
         last_changed = self.process_regelbeheerobject(session, urn_name, object_type, functional_structure_reference)
         return object_type, last_changed
-
     
     def process_regelbeheerobject(self, session, urn_name, object_type, functional_structure_reference):
-        regelbeheerobject_exists = object_type != "null"
-        if regelbeheerobject_exists:        
-            url = self.compose_regel_beheer_object_url(functional_structure_reference)
-            response = session.get(url, headers=self.headers)
+        url = self.compose_regel_beheer_object_url(functional_structure_reference)
+        response = session.get(url, headers=self.headers)
 
-            if response.ok:
-                data = response.json()
-                self.append_sttr_file(urn_name, object_type, data)
-                last_changed = self.get_last_change_date(data)
-                return last_changed
+        if response.ok:
+            data = response.json()
+            self.append_sttr_file(urn_name, object_type, data)
+            last_changed = self.get_last_change_date(data)
+            return last_changed
 
     def get_last_change_date(self, data):
         embedded = data.get('_embedded', {})
@@ -193,53 +155,16 @@ class RTR:
         
         changes = self.fetch_and_process_changes(session, data)
         data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes
-        self.write_data_to_cells(row, data_to_write)
+        self.excel_handler.write_data_to_cells(row, data_to_write)
 
-    @staticmethod
-    def set_green_intensity(index):
-        color = 'white'
-        if index < 1:
-            color = '#00FF00'
-        elif index < 8:
-            color = '#32CD32'
-        elif index < 30:
-            color = '#98FB98'
-        elif index < 60:
-            color = '#90EE90'
-        else:
-            color = '#F0FFF0'
-        return color
-
-    def write_data_to_cells(self, row, data_to_write):
-        col = 0
-        for content in data_to_write:
-            try:
-                content_date = datetime.strptime(content, "%d-%m-%Y %H:%M:%S")
-                difference = datetime.now() - content_date
-                color = self.set_green_intensity(difference.days)
-                cell_format = self.set_format(color, False, False)
-                self.worksheet.write(row - 1, col, content, cell_format)
-            except ValueError:
-                self.worksheet.write(row - 1, col, content, self.cell_format)
-            col += 1
-
-    def log_sttr_files(self):
+    def log_sttr_files(self, session):
         for key, url in self.sttr_url_by_name.items():
             identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
-            response = requests.get(url, headers=self.headers)
+            response = session.get(url, headers=self.headers)
                          
             if response.status_code == 200:
-                with open(f'log/STTR_RegelBeheerObjecten/STTR_{identifier}_{key}.xml', 'w', encoding='utf-8') as file:
+                with open(os.path.join(self.base_dir, f'log/STTR_RegelBeheerObjecten/STTR_{identifier}_{key}.xml'), 'w', encoding='utf-8') as file:
                     file.write(response.text)
             else:
                 print(f"Failed to download data from {url}, status code: {response.status_code}")
 
-def main():
-    rtr = RTR()
-    rtr.log_activities()
-
-    if rtr.args.sttr:
-        rtr.log_sttr_files()
-
-if __name__ == "__main__":
-    main()
