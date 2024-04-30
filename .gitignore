@@ -1,11 +1,9 @@
 # Exclude Python bloat
 *.pyc
 
-# Exclude xlsx bloat
-log/~$*
+# Exclude logs
+/log/*
 
 # Exclude API-keys
 code/pre_API_key.txt
 code/prod_API_key.txt
-/log/sttr
-/log/STTR_RegelBeheerObjecten
