@@ -43,18 +43,33 @@ class ExcelHandler:
         for i, header in enumerate(headers, 1):
             self.worksheet.set_column(i - 1, i - 1, max(10, len(header)) + 2)
 
-    def write_data_to_cells(self, row, data_to_write, set_green_intensity):
+    def write_data_to_cells(self, row, data_to_write):
         col = 0
         for content in data_to_write:
             try:
                 content_date = datetime.strptime(content, "%d-%m-%Y %H:%M:%S")
                 difference = datetime.now() - content_date
-                color = set_green_intensity(difference.days)
+                color = self.set_green_intensity(difference.days)
                 cell_format = self.set_format(color, False, False)
                 self.worksheet.write(row - 1, col, content, cell_format)
             except ValueError:
                 self.worksheet.write(row - 1, col, content, self.cell_format)
             col += 1
+    
+    @staticmethod
+    def set_green_intensity(index):
+        color = 'white'
+        if index < 1:
+            color = '#00FF00'
+        elif index < 8:
+            color = '#32CD32'
+        elif index < 30:
+            color = '#98FB98'
+        elif index < 60:
+            color = '#90EE90'
+        else:
+            color = '#F0FFF0'
+        return color
 
     def close_workbook(self):
         self.workbook.close()

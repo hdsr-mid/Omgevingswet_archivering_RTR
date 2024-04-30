@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 import requests
-import xlsxwriter
 import argparse
 import urllib.parse
 
@@ -49,6 +48,8 @@ class RTR:
         with requests.Session() as session:
             for row, activity in enumerate(self.urns, 2):
                 self.process_activity(session, activity, row)
+        if self.args.sttr: 
+            self.log_sttr_files()
         self.excel_handler.close_workbook()
 
     def process_activity(self, session, activity, row):
@@ -155,22 +156,7 @@ class RTR:
         
         changes = self.fetch_and_process_changes(session, data)
         data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes
-        self.excel_handler.write_data_to_cells(row, data_to_write, self.set_green_intensity)
-
-    @staticmethod
-    def set_green_intensity(index):
-        color = 'white'
-        if index < 1:
-            color = '#00FF00'
-        elif index < 8:
-            color = '#32CD32'
-        elif index < 30:
-            color = '#98FB98'
-        elif index < 60:
-            color = '#90EE90'
-        else:
-            color = '#F0FFF0'
-        return color
+        self.excel_handler.write_data_to_cells(row, data_to_write)
 
     def log_sttr_files(self):
         for key, url in self.sttr_url_by_name.items():
