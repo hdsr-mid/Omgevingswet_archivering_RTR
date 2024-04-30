@@ -5,6 +5,8 @@ import xlsxwriter
 import argparse
 import urllib.parse
 
+from excel import ExcelHandler
+
 class RTR:
     def __init__(self):
         self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  
@@ -14,7 +16,7 @@ class RTR:
         self.base_url = self.determine_base_url(self.args.env)
         self.urns = self.load_activities(os.path.join(self.base_dir, 'data', f"{self.args.env}_activiteiten_waterschapsverordening.txt"))
         self.sttr_url_by_name = {}
-        self.setup_excel()
+        self.excel_handler = ExcelHandler(self.base_dir, self.args.env, self.args.date)
 
     @staticmethod
     def parse_arguments():
@@ -43,46 +45,11 @@ class RTR:
                     urns.append(activity)
         return urns
 
-    def setup_excel(self):
-        document_name = f"waterschapsverordening_RTR_{self.args.env}_status_{self.args.date}.xlsx"
-        self.workbook = xlsxwriter.Workbook(os.path.join(self.base_dir, f"log/{document_name}"))
-        self.worksheet = self.workbook.add_worksheet()
-        self.prepare_worksheet()
-        
-    def set_format(self, color, bold, text_wrap):
-        return self.workbook.add_format({
-            'bg_color': color,
-            'text_wrap': text_wrap,
-            'align': 'left',
-            'valign': 'top',
-            'bold': bold,
-            'border': True,
-        })
-
-    def prepare_worksheet(self):
-        headers = [
-            "Activiteit                   ",
-            "Uri",
-            "Activiteiten Groep",
-            "Regel",
-            "Werkzaamheden",
-            "Wijziging Conclusie",
-            "Wijziging Melding",
-            "Wijziging Aanvraag vergunning",
-            "Wijziging Informatie",
-        ]
-        
-        header_format = self.set_format('#DDDDDD', True, True)
-        self.cell_format = self.set_format('white', False, False)
-        self.worksheet.write_row('A1', headers, header_format)
-        for i, header in enumerate(headers, 1):
-            self.worksheet.set_column(i - 1, i - 1, max(10, len(header)) + 2)
-
     def log_activities(self):
         with requests.Session() as session:
             for row, activity in enumerate(self.urns, 2):
                 self.process_activity(session, activity, row)
-        self.workbook.close()
+        self.excel_handler.close_workbook()
 
     def process_activity(self, session, activity, row):
         name, _, uri, _, activity_group, rule_reference, _ = activity
@@ -188,7 +155,7 @@ class RTR:
         
         changes = self.fetch_and_process_changes(session, data)
         data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes
-        self.write_data_to_cells(row, data_to_write)
+        self.excel_handler.write_data_to_cells(row, data_to_write, self.set_green_intensity)
 
     @staticmethod
     def set_green_intensity(index):
@@ -204,19 +171,6 @@ class RTR:
         else:
             color = '#F0FFF0'
         return color
-
-    def write_data_to_cells(self, row, data_to_write):
-        col = 0
-        for content in data_to_write:
-            try:
-                content_date = datetime.strptime(content, "%d-%m-%Y %H:%M:%S")
-                difference = datetime.now() - content_date
-                color = self.set_green_intensity(difference.days)
-                cell_format = self.set_format(color, False, False)
-                self.worksheet.write(row - 1, col, content, cell_format)
-            except ValueError:
-                self.worksheet.write(row - 1, col, content, self.cell_format)
-            col += 1
 
     def log_sttr_files(self):
         for key, url in self.sttr_url_by_name.items():
