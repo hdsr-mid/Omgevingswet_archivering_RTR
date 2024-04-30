@@ -115,23 +115,20 @@ class RTR:
         
         if "regelBeheerObjecten" in data:
             for object in data["regelBeheerObjecten"]:
-                object_type, last_changed = self.process_individual_object(session, urn_name, object)
+                object_type = object["typering"]
+                if object_type == "Indieningsvereisten":
+                    object_type = object["toestemming"]["waarde"]
+                else:
+                    object_type = "null"
+
+                functional_structure_reference = object["functioneleStructuurRef"]
+                lastChanged = self.process_regelbeheerobject(session, urn_name, object_type, functional_structure_reference)
                 if object_type in {"Conclusie", "Melding", "Aanvraag vergunning", "Informatie"}:
-                    index = ["Conclusie", "Melding", "Aanvraag vergunning", "Informatie"].index(object_type)
-                    changes[index] = last_changed
+                    index = ["Conclusie", "Melding", "Aanvraag vergunning", "Informatie"].index(
+                        object_type
+                    )
+                    changes[index] = lastChanged
         return changes
-
-    def process_individual_object(self, session, urn_name, object):
-        object_type = object["typering"]
-        if object_type == "Indieningsvereisten":
-            object_type = object["toestemming"]["waarde"]
-        else:
-            object_type = "null"
-
-        functional_structure_reference = object["functioneleStructuurRef"]
-        last_changed = self.process_regelbeheerobject(session, urn_name, object_type, functional_structure_reference)
-        return object_type, last_changed
-
     
     def process_regelbeheerobject(self, session, urn_name, object_type, functional_structure_reference):
         regelbeheerobject_exists = object_type != "null"
