@@ -7,7 +7,7 @@ import urllib.parse
 
 class RTR:
     def __init__(self):
-        self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Parent of the directory where the script is located        self.args = self.parse_arguments()
+        self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  
         self.args = self.parse_arguments()
         self.api_key = self.load_api_key(os.path.join(self.base_dir, 'code', f"{self.args.env}_API_key.txt"))
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}

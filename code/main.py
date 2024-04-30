@@ -1,9 +1,4 @@
-import os
-
-script_dir = os.path.dirname(os.path.abspath(__file__))
-os.chdir(script_dir)
-
-from rtr import RTR
+from rtr import RTR  
 
 def main():
     rtr = RTR() 
