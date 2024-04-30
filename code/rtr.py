@@ -12,13 +12,12 @@ class RTR:
         self.args = self.parse_command_line_arguments()
         self.api_key = self.load_api_key(os.path.join(self.base_dir, 'code', f"{self.args.env}_API_key.txt"))
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
-        self.base_url = self.determine_base_url(self.args.env)
+        self.base_url = self.compose_base_url(self.args.env)
         self.urns = self.load_activities(os.path.join(self.base_dir, 'data', f"{self.args.env}_activiteiten_waterschapsverordening.txt"))
         self.session = requests.Session()
         self.sttr_url_by_name = {}
         self.excel_handler = ExcelHandler(self.base_dir, self.args.env, self.args.date)
         
-
     @staticmethod
     def parse_command_line_arguments():
         parser = argparse.ArgumentParser(description="Process some environment settings and actions.")
@@ -46,18 +45,18 @@ class RTR:
                     urns.append(activity)
         return urns
 
-    def log_activities(self):
+    def archive_activities(self):
         for row, activity in enumerate(self.urns, 2):
             self.process_activity(activity, row)
         if self.args.sttr: 
-            self.log_sttr_files()
+            self.archive_sttr_files()
         self.excel_handler.close_workbook()
 
     def process_activity(self, activity, row):
         name, _, uri, _, activity_group, rule_reference, _ = activity
         response_json = self.get_activity_data(uri)
         if response_json:
-            self.log_activity_data(
+            self.archive_activity_data(
                 row, name, uri, activity_group, rule_reference, response_json
             )
 
@@ -138,7 +137,7 @@ class RTR:
             return "Unknown"  
 
     @staticmethod
-    def determine_base_url(env):
+    def compose_base_url(env):
         if env == "prod":
             return "https://service.omgevingswet.overheid.nl/publiek/toepasbare-regels/api"
         if env == "pre":
@@ -151,20 +150,20 @@ class RTR:
     def compose_regel_beheer_object_url(self, functional_structure_reference):
         return f"{self.base_url}/toepasbareregelsuitvoerengegevens/v1/toepasbareRegels?functioneleStructuurRef={functional_structure_reference}&datum={self.args.date}"
 
-    def log_activity_data(self, row, name, uri, activity_group, rule_reference, data):
+    def archive_activity_data(self, row, name, uri, activity_group, rule_reference, data):
         werkzaamheden = self.extract_werkzaamheden(data)
         
         changes = self.fetch_and_process_changes(data)
         data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes
         self.excel_handler.write_data_to_cells(row, data_to_write)
 
-    def log_sttr_files(self):
+    def archive_sttr_files(self):
         for key, url in self.sttr_url_by_name.items():
             identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
             response = self.session.get(url, headers=self.headers)
                          
             if response.status_code == 200:
-                with open(os.path.join(self.base_dir, f'log/STTR_RegelBeheerObjecten/STTR_{identifier}_{key}.xml'), 'w', encoding='utf-8') as file:
+                with open(os.path.join(self.base_dir, 'log', f'STTR_RegelBeheerObjecten/STTR_{identifier}_{key}.xml'), 'w', encoding='utf-8') as file:
                     file.write(response.text)
             else:
                 print(f"Failed to download data from {url}, status code: {response.status_code}")

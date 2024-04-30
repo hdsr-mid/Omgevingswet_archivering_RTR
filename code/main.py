@@ -1,7 +1,7 @@
 from rtr import RTR  
 
 def main():
-    RTR().log_activities()
+    RTR().archive_activities()
 
 if __name__ == "__main__":
     main()
