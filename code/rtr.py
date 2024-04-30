@@ -48,8 +48,8 @@ class RTR:
         with requests.Session() as session:
             for row, activity in enumerate(self.urns, 2):
                 self.process_activity(session, activity, row)
-        if self.args.sttr: 
-            self.log_sttr_files()
+            if self.args.sttr: 
+                self.log_sttr_files(session)
         self.excel_handler.close_workbook()
 
     def process_activity(self, session, activity, row):
@@ -97,7 +97,6 @@ class RTR:
         functional_structure_reference = object["functioneleStructuurRef"]
         last_changed = self.process_regelbeheerobject(session, urn_name, object_type, functional_structure_reference)
         return object_type, last_changed
-
     
     def process_regelbeheerobject(self, session, urn_name, object_type, functional_structure_reference):
         url = self.compose_regel_beheer_object_url(functional_structure_reference)
@@ -158,10 +157,10 @@ class RTR:
         data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes
         self.excel_handler.write_data_to_cells(row, data_to_write)
 
-    def log_sttr_files(self):
+    def log_sttr_files(self, session):
         for key, url in self.sttr_url_by_name.items():
             identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
-            response = requests.get(url, headers=self.headers)
+            response = session.get(url, headers=self.headers)
                          
             if response.status_code == 200:
                 with open(os.path.join(self.base_dir, f'log/STTR_RegelBeheerObjecten/STTR_{identifier}_{key}.xml'), 'w', encoding='utf-8') as file:
