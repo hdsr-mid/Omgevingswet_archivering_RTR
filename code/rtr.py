@@ -125,8 +125,6 @@ class RTR:
         object_type = object["typering"]
         if object_type == "Indieningsvereisten":
             object_type = object["toestemming"]["waarde"]
-        else:
-            object_type = "null"
 
         functional_structure_reference = object["functioneleStructuurRef"]
         last_changed = self.process_regelbeheerobject(session, urn_name, object_type, functional_structure_reference)
