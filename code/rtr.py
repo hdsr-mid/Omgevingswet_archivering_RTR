@@ -7,13 +7,12 @@ import urllib.parse
 
 class RTR:
     def __init__(self):
-        os.chdir("D:\\HDSR\Github\waterschapsverordening_log_RTR_status")      # home
-        #os.chdir("G:\\Github\waterschapsverordening_log_RTR_status")            # work
+        self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Parent of the directory where the script is located        self.args = self.parse_arguments()
         self.args = self.parse_arguments()
-        self.api_key = self.load_api_key(f"code/{self.args.env}_API_key.txt")
+        self.api_key = self.load_api_key(os.path.join(self.base_dir, 'code', f"{self.args.env}_API_key.txt"))
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
         self.base_url = self.determine_base_url(self.args.env)
-        self.urns = self.load_activities(f"data/{self.args.env}_activiteiten_waterschapsverordening.txt")
+        self.urns = self.load_activities(os.path.join(self.base_dir, 'data', f"{self.args.env}_activiteiten_waterschapsverordening.txt"))
         self.sttr_url_by_name = {}
         self.setup_excel()
 
@@ -46,7 +45,7 @@ class RTR:
 
     def setup_excel(self):
         document_name = f"waterschapsverordening_RTR_{self.args.env}_status_{self.args.date}.xlsx"
-        self.workbook = xlsxwriter.Workbook(f"log/{document_name}")
+        self.workbook = xlsxwriter.Workbook(os.path.join(self.base_dir, f"log/{document_name}"))
         self.worksheet = self.workbook.add_worksheet()
         self.prepare_worksheet()
         
@@ -229,17 +228,8 @@ class RTR:
             response = requests.get(url, headers=self.headers)
                          
             if response.status_code == 200:
-                with open(f'log/STTR_RegelBeheerObjecten/STTR_{identifier}_{key}.xml', 'w', encoding='utf-8') as file:
+                with open(os.path.join(self.base_dir, f'log/STTR_RegelBeheerObjecten/STTR_{identifier}_{key}.xml'), 'w', encoding='utf-8') as file:
                     file.write(response.text)
             else:
                 print(f"Failed to download data from {url}, status code: {response.status_code}")
 
-def main():
-    rtr = RTR()
-    rtr.log_activities()
-
-    if rtr.args.sttr:
-        rtr.log_sttr_files()
-
-if __name__ == "__main__":
-    main()
