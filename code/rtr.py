@@ -132,16 +132,14 @@ class RTR:
 
     
     def process_regelbeheerobject(self, session, urn_name, object_type, functional_structure_reference):
-        regelbeheerobject_exists = object_type != "null"
-        if regelbeheerobject_exists:        
-            url = self.compose_regel_beheer_object_url(functional_structure_reference)
-            response = session.get(url, headers=self.headers)
+        url = self.compose_regel_beheer_object_url(functional_structure_reference)
+        response = session.get(url, headers=self.headers)
 
-            if response.ok:
-                data = response.json()
-                self.append_sttr_file(urn_name, object_type, data)
-                last_changed = self.get_last_change_date(data)
-                return last_changed
+        if response.ok:
+            data = response.json()
+            self.append_sttr_file(urn_name, object_type, data)
+            last_changed = self.get_last_change_date(data)
+            return last_changed
 
     def get_last_change_date(self, data):
         embedded = data.get('_embedded', {})
