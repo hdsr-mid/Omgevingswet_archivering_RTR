@@ -7,8 +7,8 @@ import urllib.parse
 
 class RTR:
     def __init__(self):
-        #os.chdir("D:\\HDSR\Github\waterschapsverordening_log_RTR_status")      # home
-        os.chdir("G:\\Github\waterschapsverordening_log_RTR_status")            # work
+        os.chdir("D:\\HDSR\Github\waterschapsverordening_log_RTR_status")      # home
+        #os.chdir("G:\\Github\waterschapsverordening_log_RTR_status")            # work
         self.args = self.parse_arguments()
         self.api_key = self.load_api_key(f"code/{self.args.env}_API_key.txt")
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
@@ -116,20 +116,23 @@ class RTR:
         
         if "regelBeheerObjecten" in data:
             for object in data["regelBeheerObjecten"]:
-                object_type = object["typering"]
-                if object_type == "Indieningsvereisten":
-                    object_type = object["toestemming"]["waarde"]
-                else:
-                    object_type = "null"
-
-                functional_structure_reference = object["functioneleStructuurRef"]
-                lastChanged = self.process_regelbeheerobject(session, urn_name, object_type, functional_structure_reference)
+                object_type, last_changed = self.process_individual_object(session, urn_name, object)
                 if object_type in {"Conclusie", "Melding", "Aanvraag vergunning", "Informatie"}:
-                    index = ["Conclusie", "Melding", "Aanvraag vergunning", "Informatie"].index(
-                        object_type
-                    )
-                    changes[index] = lastChanged
+                    index = ["Conclusie", "Melding", "Aanvraag vergunning", "Informatie"].index(object_type)
+                    changes[index] = last_changed
         return changes
+
+    def process_individual_object(self, session, urn_name, object):
+        object_type = object["typering"]
+        if object_type == "Indieningsvereisten":
+            object_type = object["toestemming"]["waarde"]
+        else:
+            object_type = "null"
+
+        functional_structure_reference = object["functioneleStructuurRef"]
+        last_changed = self.process_regelbeheerobject(session, urn_name, object_type, functional_structure_reference)
+        return object_type, last_changed
+
     
     def process_regelbeheerobject(self, session, urn_name, object_type, functional_structure_reference):
         regelbeheerobject_exists = object_type != "null"
