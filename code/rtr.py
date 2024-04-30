@@ -9,16 +9,18 @@ from excel import ExcelHandler
 class RTR:
     def __init__(self):
         self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  
-        self.args = self.parse_arguments()
+        self.args = self.parse_command_line_arguments()
         self.api_key = self.load_api_key(os.path.join(self.base_dir, 'code', f"{self.args.env}_API_key.txt"))
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
         self.base_url = self.determine_base_url(self.args.env)
         self.urns = self.load_activities(os.path.join(self.base_dir, 'data', f"{self.args.env}_activiteiten_waterschapsverordening.txt"))
+        self.session = requests.Session()
         self.sttr_url_by_name = {}
         self.excel_handler = ExcelHandler(self.base_dir, self.args.env, self.args.date)
+        
 
     @staticmethod
-    def parse_arguments():
+    def parse_command_line_arguments():
         parser = argparse.ArgumentParser(description="Process some environment settings and actions.")
         parser.add_argument('--env', type=str, default="prod", choices=['prod', 'pre'],
                             help='Environment setting: prod (default) or pre.')
@@ -45,24 +47,23 @@ class RTR:
         return urns
 
     def log_activities(self):
-        with requests.Session() as session:
-            for row, activity in enumerate(self.urns, 2):
-                self.process_activity(session, activity, row)
-            if self.args.sttr: 
-                self.log_sttr_files(session)
+        for row, activity in enumerate(self.urns, 2):
+            self.process_activity(activity, row)
+        if self.args.sttr: 
+            self.log_sttr_files()
         self.excel_handler.close_workbook()
 
-    def process_activity(self, session, activity, row):
+    def process_activity(self, activity, row):
         name, _, uri, _, activity_group, rule_reference, _ = activity
-        response_json = self.fetch_activity_data(session, uri)
+        response_json = self.get_activity_data(uri)
         if response_json:
             self.log_activity_data(
-                session, row, name, uri, activity_group, rule_reference, response_json
+                row, name, uri, activity_group, rule_reference, response_json
             )
 
-    def fetch_activity_data(self, session, uri):
+    def get_activity_data(self, uri):
         url = self.compose_activity_url(uri)
-        response = session.get(url, headers=self.headers)
+        response = self.session.get(url, headers=self.headers)
         if response.ok:
             return response.json()
         print(f"Error fetching data for URI {uri}: {response.status_code}")
@@ -77,30 +78,30 @@ class RTR:
                 werkzaamheden_list.append(extracted_id)
         return [', '.join(werkzaamheden_list)] if werkzaamheden_list else [""]
 
-    def fetch_and_process_changes(self, session, data):
+    def fetch_and_process_changes(self, data):
         urn_name = data["urn"].split(".")[-1]
         changes = ["", "", "", ""]
         
         if "regelBeheerObjecten" in data:
             for object in data["regelBeheerObjecten"]:
-                object_type, last_changed = self.process_individual_object(session, urn_name, object)
+                object_type, last_changed = self.process_individual_object(urn_name, object)
                 if object_type in {"Conclusie", "Melding", "Aanvraag vergunning", "Informatie"}:
                     index = ["Conclusie", "Melding", "Aanvraag vergunning", "Informatie"].index(object_type)
                     changes[index] = last_changed
         return changes
 
-    def process_individual_object(self, session, urn_name, object):
+    def process_individual_object(self, urn_name, object):
         object_type = object["typering"]
         if object_type == "Indieningsvereisten":
             object_type = object["toestemming"]["waarde"]
 
         functional_structure_reference = object["functioneleStructuurRef"]
-        last_changed = self.process_regelbeheerobject(session, urn_name, object_type, functional_structure_reference)
+        last_changed = self.get_regelbeheerobject(urn_name, object_type, functional_structure_reference)
         return object_type, last_changed
     
-    def process_regelbeheerobject(self, session, urn_name, object_type, functional_structure_reference):
+    def get_regelbeheerobject(self, urn_name, object_type, functional_structure_reference):
         url = self.compose_regel_beheer_object_url(functional_structure_reference)
-        response = session.get(url, headers=self.headers)
+        response = self.session.get(url, headers=self.headers)
 
         if response.ok:
             data = response.json()
@@ -150,17 +151,17 @@ class RTR:
     def compose_regel_beheer_object_url(self, functional_structure_reference):
         return f"{self.base_url}/toepasbareregelsuitvoerengegevens/v1/toepasbareRegels?functioneleStructuurRef={functional_structure_reference}&datum={self.args.date}"
 
-    def log_activity_data(self, session, row, name, uri, activity_group, rule_reference, data):
+    def log_activity_data(self, row, name, uri, activity_group, rule_reference, data):
         werkzaamheden = self.extract_werkzaamheden(data)
         
-        changes = self.fetch_and_process_changes(session, data)
+        changes = self.fetch_and_process_changes(data)
         data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes
         self.excel_handler.write_data_to_cells(row, data_to_write)
 
-    def log_sttr_files(self, session):
+    def log_sttr_files(self):
         for key, url in self.sttr_url_by_name.items():
             identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
-            response = session.get(url, headers=self.headers)
+            response = self.session.get(url, headers=self.headers)
                          
             if response.status_code == 200:
                 with open(os.path.join(self.base_dir, f'log/STTR_RegelBeheerObjecten/STTR_{identifier}_{key}.xml'), 'w', encoding='utf-8') as file:
