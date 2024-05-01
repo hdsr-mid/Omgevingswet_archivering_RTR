@@ -13,7 +13,7 @@ class RTR:
         self.api_key = self.load_api_key(os.path.join(self.base_dir, 'code', f"{self.args.env}_API_key.txt"))
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
         self.base_url = self.compose_base_url(self.args.env)
-        self.urns = self.load_activities(os.path.join(self.base_dir, 'data', f"{self.args.env}_activiteiten_waterschapsverordening.txt"))
+        self.urns = self.load_activities(os.path.join(self.base_dir, 'data', f"frames_{self.args.env}_activiteiten.txt"))
         self.session = requests.Session()
         self.sttr_url_per_activity = {}
         self.werkingsgebied_per_activity = {}
@@ -64,41 +64,10 @@ class RTR:
                 row, name, uri, activity_group, rule_reference, response_json
             )
 
-    def fetch_location_details(self):
-        # Adjust the URL based on the specific object you are querying
-        gebieds_url = "https://service.omgevingswet.overheid.nl/publiek/omgevingsdocumenten/api/presenteren/v7/activiteitlocatieaanduidingen/_zoek"
-        headers = self.headers
-        headers['Content-Type'] = 'application/json'  # Ensure header includes Content-Type as application/json
-
-        # The body of the POST request with the specified zoekParameters
-        search_payload = {
-            "zoekParameters": [
-                {
-                    "parameter": "locatie.identificatie",
-                    "zoekWaarden": [
-                        "nl.imow-ws0636.gebied.2023000034"
-                        ]
-                }
-            ]
-        }
-
-        # Making the POST request
-        response = self.session.post(gebieds_url, headers=headers, json=search_payload)
-        if response.ok:
-            print('ok', response.json(), '\n')
-        else:
-            print(f"Failed to fetch data: {response.status_code} {response.text}")
-
-
-
     def get_activity_data(self, uri):
         url = self.compose_activity_url(uri)
         response = self.session.get(url, headers=self.headers)
         
-        if self.run_once == False:
-            self.fetch_location_details()
-            self.run_once = True
-
         if response.ok:
             self.update_werkingsgebied_per_activity(response.json())
             return response.json()
@@ -109,7 +78,9 @@ class RTR:
     def update_werkingsgebied_per_activity(self, json_data):
         activity_description = json_data.get('omschrijving', 'No description')
         identifications = [loc['identificatie'] for loc in json_data.get('locaties', [])]
-        
+
+        print(identifications)
+       
         if activity_description in self.werkingsgebied_per_activity:
             self.werkingsgebied_per_activity[activity_description].extend(identifications)
         else:
@@ -215,3 +186,43 @@ class RTR:
             else:
                 print(f"Failed to download data from {url}, status code: {response.status_code}")
 
+
+
+
+
+
+
+
+
+
+    # def fetch_location_details(self):
+    #     # Adjust the URL based on the specific object you are querying
+
+    #     #activiteitlocatieaanduidingen/_zoek
+    #     #gebiedsaanwijzingen/_zoek
+    #     #regelteksten/_zoek
+    #     #omgevingsnormen/_zoek
+    #     #omgevingswaarden/_zoek
+
+    #     gebieds_url = "https://service.omgevingswet.overheid.nl/publiek/omgevingsdocumenten/api/presenteren/v7/gebiedsaanwijzingen/_zoek"
+    #     headers = self.headers
+    #     headers['Content-Type'] = 'application/json'  # Ensure header includes Content-Type as application/json
+
+    #     # The body of the POST request with the specified zoekParameters
+    #     search_payload = {
+    #         "zoekParameters": [
+    #             {
+    #                 "parameter": "locatie.identificatie",
+    #                 "zoekWaarden": [
+    #                     "nl.imow-ws0636.gebied.2023000034"
+    #                     ]
+    #             }
+    #         ]
+    #     }
+
+    #     # Making the POST request
+    #     response = self.session.post(gebieds_url, headers=headers, json=search_payload)
+    #     if response.ok:
+    #         print('ok', response.json(), '\n')
+    #     else:
+    #         print(f"Failed to fetch data: {response.status_code} {response.text}")
