@@ -5,15 +5,18 @@ import argparse
 import urllib.parse
 
 from excel import ExcelHandler
+from vendor import Vendor
 
 class RTR:
-    def __init__(self):
+    def __init__(self, software):
         self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  
         self.args = self.parse_command_line_arguments()
         self.api_key = self.load_api_key(os.path.join(self.base_dir, 'code', f"{self.args.env}_API_key.txt"))
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
         self.base_url = self.compose_base_url(self.args.env)
-        self.urns = self.load_activities(os.path.join(self.base_dir, 'data', f"frames_{self.args.env}_activiteiten.txt"))
+        self.vendor = Vendor(software, self.args.env)
+        self.urns = self.vendor.urns
+        self.geo_variables = self.vendor.variable_names_by_index
         self.session = requests.Session()
         self.sttr_url_per_activity = {}
         self.werkingsgebied_per_activity = {}
@@ -37,23 +40,11 @@ class RTR:
         with open(api_key_file) as key_file:
             return key_file.read().strip()
 
-    @staticmethod
-    def load_activities(activities_file):
-        urns = []
-        with open(activities_file) as file:
-            for line in file:
-                activity = line.strip().split("\t")
-                if len(activity) < 8:
-                    urns.append(activity)
-        return urns
-
     def archive_activities(self):
         for row, activity in enumerate(self.urns, 2):
             self.process_activity(activity, row)
         if self.args.sttr: 
             self.archive_sttr_files()
-
-        print('\n', self.werkingsgebied_per_activity)
         self.excel_handler.close_workbook()
 
     def process_activity(self, activity, row):
@@ -79,12 +70,29 @@ class RTR:
         activity_description = json_data.get('omschrijving', 'No description')
         identifications = [loc['identificatie'] for loc in json_data.get('locaties', [])]
 
-        print(identifications)
-       
+        # Initialize a list to hold the descriptions matched from self.geo_variables or the specific case
+        matched_descriptions = []
+        for url in identifications:
+            if url == 'nl.imow-ws0636.ambtsgebied.HDSR':
+                description = 'Ambtsgebied HDSR'
+            else:
+                # Extract the last two digits of the identifier to get the index
+                index = url.split('.')[-1][-2:]  # Assumes format ends with two digits like '2023000038'
+                description = self.geo_variables.get(index, f"null: {url}")  # Get the description or 'Unknown description'
+            matched_descriptions.append(description)
+        
+        # Check if the activity description already exists in the dictionary
         if activity_description in self.werkingsgebied_per_activity:
-            self.werkingsgebied_per_activity[activity_description].extend(identifications)
+            self.werkingsgebied_per_activity[activity_description].extend(matched_descriptions)
         else:
-            self.werkingsgebied_per_activity[activity_description] = identifications
+            self.werkingsgebied_per_activity[activity_description] = matched_descriptions
+
+        file_path = os.path.join(self.base_dir, 'log', "werkingsgebieden.txt")
+        with open(file_path, 'w') as file:
+            for key, values in self.werkingsgebied_per_activity.items():
+                file.write(f"{key}: {', '.join(values)}\n\n")
+
+
 
 
     @staticmethod
