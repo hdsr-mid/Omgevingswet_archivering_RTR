@@ -67,30 +67,45 @@ class RTR:
     
 
     def update_werkingsgebied_per_activity(self, json_data):
-        activity_description = json_data.get('omschrijving', 'No description')
-        identifications = [loc['identificatie'] for loc in json_data.get('locaties', [])]
+        activity_description = self.extract_activity_description(json_data)
+        identifications = self.extract_identifications(json_data)
+        matched_descriptions = self.match_descriptions(identifications)
+        self.update_activity_mapping(activity_description, matched_descriptions)
+        self.write_to_file()
 
-        # Initialize a list to hold the descriptions matched from self.geo_variables or the specific case
+    def extract_activity_description(self, json_data):
+        return json_data.get('omschrijving', 'No description')
+
+    def extract_identifications(self, json_data):
+        return [loc['identificatie'] for loc in json_data.get('locaties', [])]
+
+    def match_descriptions(self, identifications):
         matched_descriptions = []
         for url in identifications:
-            if url == 'nl.imow-ws0636.ambtsgebied.HDSR':
-                description = 'Ambtsgebied HDSR'
-            else:
-                # Extract the last two digits of the identifier to get the index
-                index = url.split('.')[-1][-2:]  # Assumes format ends with two digits like '2023000038'
-                description = self.geo_variables.get(index, f"null: {url}")  # Get the description or 'Unknown description'
+            description = self.get_description(url)
             matched_descriptions.append(description)
-        
-        # Check if the activity description already exists in the dictionary
+        return matched_descriptions
+
+    def get_description(self, url):
+        if url == 'nl.imow-ws0636.ambtsgebied.HDSR':
+            return 'Ambtsgebied HDSR'
+        else:
+            index = url.split('.')[-1][-2:]
+            clean_index = index.lstrip('0')
+            return self.geo_variables.get(clean_index, f"null: {url}")
+
+    def update_activity_mapping(self, activity_description, matched_descriptions):
         if activity_description in self.werkingsgebied_per_activity:
             self.werkingsgebied_per_activity[activity_description].extend(matched_descriptions)
         else:
             self.werkingsgebied_per_activity[activity_description] = matched_descriptions
 
+    def write_to_file(self):
         file_path = os.path.join(self.base_dir, 'log', "werkingsgebieden.txt")
         with open(file_path, 'w') as file:
             for key, values in self.werkingsgebied_per_activity.items():
                 file.write(f"{key}: {', '.join(values)}\n\n")
+
 
 
 
