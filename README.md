@@ -4,9 +4,9 @@ Via dit script kunnen gegevens uit de RTR worden opgevraagd en lokaal worden gea
 
 Gebruik
 ```
---env prod/pre        # Selecteer de juiste omgeving,               standaard: prod
---date 01-01-2024     # Datum voor het tijdstip van de RTR,         standaard: vandaag
---sttr                # Sla per regelbeheerobject de DMN logica op  standaard: uit
+--env prod/pre             # Selecteer de gewenste omgeving . . . . . . . standaard: prod
+--date 01-01-2024          # Kies een datum . . . . . . . . . . . . . . . standaard: vandaag
+--sttr                     # Archiveer de DMN logica per activiteit . . . standaard: uit
 
 voorbeeld: python.exe code/log_RTR_status_via_API.py
 voorbeeld: python.exe code/log_RTR_status_via_API.py --env pre --date 03-03-2024
