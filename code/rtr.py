@@ -16,6 +16,7 @@ class RTR:
         self.urns = self.load_activities(os.path.join(self.base_dir, 'data', f"{self.args.env}_activiteiten_waterschapsverordening.txt"))
         self.session = requests.Session()
         self.sttr_url_by_name = {}
+        self.werkingsgebied_per_activity = {}
         self.excel_handler = ExcelHandler(self.base_dir, self.args.env, self.args.date)
         
     @staticmethod
@@ -50,6 +51,8 @@ class RTR:
             self.process_activity(activity, row)
         if self.args.sttr: 
             self.archive_sttr_files()
+
+        print(self.werkingsgebied_per_activity)
         self.excel_handler.close_workbook()
 
     def process_activity(self, activity, row):
@@ -64,9 +67,21 @@ class RTR:
         url = self.compose_activity_url(uri)
         response = self.session.get(url, headers=self.headers)
         if response.ok:
+            self.update_werkingsgebied_per_activity(response.json())
             return response.json()
         print(f"Error fetching data for URI {uri}: {response.status_code}")
         return None
+    
+
+    def update_werkingsgebied_per_activity(self, json_data):
+        activity_description = json_data.get('omschrijving', 'No description')
+        identifications = [loc['identificatie'] for loc in json_data.get('locaties', [])]
+        
+        if activity_description in self.werkingsgebied_per_activity:
+            self.werkingsgebied_per_activity[activity_description].extend(identifications)
+        else:
+            self.werkingsgebied_per_activity[activity_description] = identifications
+
 
     @staticmethod
     def extract_werkzaamheden(data):
@@ -119,7 +134,7 @@ class RTR:
     def append_sttr_file(self, urn_name, regelbeheerobject_type, data):
         try:
             sttr_bestand_href = data['_embedded']['toepasbareRegels'][0]['_links']['sttrBestand']['href']
-            
+            print(sttr_bestand_href)
             if regelbeheerobject_type != "null":
                 regelbeheerobject_name = urn_name + "_" + regelbeheerobject_type.replace(" ", "_")
                 self.sttr_url_by_name[regelbeheerobject_name] = sttr_bestand_href
