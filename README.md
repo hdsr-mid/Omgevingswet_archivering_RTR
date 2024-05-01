@@ -1,3 +1,5 @@
+# Archivering van de RTR voor de Waterschapsverorderning
+
 Via dit script kunnen gegevens uit de RTR worden opgevraagd en lokaal worden gearchiveerd. Denk daarbij aan het genereren van een Excel overzicht van activiteiten en hun bijbehorende werkzaamheden en regelbeheerobjecten en het downloaden van de DMN logica uit de STTR. 
 
 Gebruik
