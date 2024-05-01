@@ -15,7 +15,7 @@ class RTR:
         self.base_url = self.compose_base_url(self.args.env)
         self.urns = self.load_activities(os.path.join(self.base_dir, 'data', f"{self.args.env}_activiteiten_waterschapsverordening.txt"))
         self.session = requests.Session()
-        self.sttr_url_by_name = {}
+        self.sttr_url_per_activity = {}
         self.werkingsgebied_per_activity = {}
         self.excel_handler = ExcelHandler(self.base_dir, self.args.env, self.args.date)
         
@@ -52,7 +52,7 @@ class RTR:
         if self.args.sttr: 
             self.archive_sttr_files()
 
-        print(self.werkingsgebied_per_activity)
+        print('\n', self.werkingsgebied_per_activity)
         self.excel_handler.close_workbook()
 
     def process_activity(self, activity, row):
@@ -63,9 +63,37 @@ class RTR:
                 row, name, uri, activity_group, rule_reference, response_json
             )
 
+    def fetch_location_details(self):
+        # Adjust the URL based on the specific object you are querying
+        gebieds_url = "https://service.omgevingswet.overheid.nl/publiek/omgevingsdocumenten/api/presenteren/v7/gebiedsaanwijzingen/_zoek"
+        headers = self.headers
+        headers['Content-Type'] = 'application/json'  # Ensure header includes Content-Type as application/json
+
+        # The body of the POST request with the specified zoekParameters
+        search_payload = {
+            "zoekParameters": [
+                {
+                    "parameter": "locatie.identificatie",
+                    "zoekWaarden": ["nl.imow-ws0636.gebied.2023000034"]
+                }
+            ]
+        }
+
+        # Making the POST request
+        response = self.session.post(gebieds_url, headers=headers, json=search_payload)
+        if response.ok:
+            print('ok', response.json())
+        else:
+            print(f"Failed to fetch data: {response.status_code} {response.text}")
+
+
+
     def get_activity_data(self, uri):
         url = self.compose_activity_url(uri)
         response = self.session.get(url, headers=self.headers)
+
+        self.fetch_location_details()
+
         if response.ok:
             self.update_werkingsgebied_per_activity(response.json())
             return response.json()
@@ -134,10 +162,9 @@ class RTR:
     def append_sttr_file(self, urn_name, regelbeheerobject_type, data):
         try:
             sttr_bestand_href = data['_embedded']['toepasbareRegels'][0]['_links']['sttrBestand']['href']
-            print(sttr_bestand_href)
             if regelbeheerobject_type != "null":
                 regelbeheerobject_name = urn_name + "_" + regelbeheerobject_type.replace(" ", "_")
-                self.sttr_url_by_name[regelbeheerobject_name] = sttr_bestand_href
+                self.sttr_url_per_activity[regelbeheerobject_name] = sttr_bestand_href
             
         except KeyError as e:
             identifier = self.extract_identifier(data)
@@ -173,7 +200,7 @@ class RTR:
         self.excel_handler.write_data_to_cells(row, data_to_write)
 
     def archive_sttr_files(self):
-        for key, url in self.sttr_url_by_name.items():
+        for key, url in self.sttr_url_per_activity.items():
             identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
             response = self.session.get(url, headers=self.headers)
                          
