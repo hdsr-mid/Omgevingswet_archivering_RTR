@@ -18,6 +18,7 @@ class RTR:
         self.sttr_url_per_activity = {}
         self.werkingsgebied_per_activity = {}
         self.excel_handler = ExcelHandler(self.base_dir, self.args.env, self.args.date)
+        self.run_once = False
         
     @staticmethod
     def parse_command_line_arguments():
@@ -65,7 +66,7 @@ class RTR:
 
     def fetch_location_details(self):
         # Adjust the URL based on the specific object you are querying
-        gebieds_url = "https://service.omgevingswet.overheid.nl/publiek/omgevingsdocumenten/api/presenteren/v7/gebiedsaanwijzingen/_zoek"
+        gebieds_url = "https://service.omgevingswet.overheid.nl/publiek/omgevingsdocumenten/api/presenteren/v7/activiteitlocatieaanduidingen/_zoek"
         headers = self.headers
         headers['Content-Type'] = 'application/json'  # Ensure header includes Content-Type as application/json
 
@@ -74,7 +75,9 @@ class RTR:
             "zoekParameters": [
                 {
                     "parameter": "locatie.identificatie",
-                    "zoekWaarden": ["nl.imow-ws0636.gebied.2023000034"]
+                    "zoekWaarden": [
+                        "nl.imow-ws0636.gebied.2023000034"
+                        ]
                 }
             ]
         }
@@ -82,7 +85,7 @@ class RTR:
         # Making the POST request
         response = self.session.post(gebieds_url, headers=headers, json=search_payload)
         if response.ok:
-            print('ok', response.json())
+            print('ok', response.json(), '\n')
         else:
             print(f"Failed to fetch data: {response.status_code} {response.text}")
 
@@ -91,8 +94,10 @@ class RTR:
     def get_activity_data(self, uri):
         url = self.compose_activity_url(uri)
         response = self.session.get(url, headers=self.headers)
-
-        self.fetch_location_details()
+        
+        if self.run_once == False:
+            self.fetch_location_details()
+            self.run_once = True
 
         if response.ok:
             self.update_werkingsgebied_per_activity(response.json())
