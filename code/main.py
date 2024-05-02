@@ -1,7 +1,8 @@
-from rtr import RTR  
+from rtr import RTR
 
 def main():
-    RTR().archive_activities()
+    software = "Match"
+    RTR(software).archive_activities()
 
 if __name__ == "__main__":
     main()

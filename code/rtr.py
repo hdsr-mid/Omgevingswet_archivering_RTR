@@ -5,19 +5,23 @@ import argparse
 import urllib.parse
 
 from excel import ExcelHandler
+from vendor import Vendor
 
 class RTR:
-    def __init__(self):
-        self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  
+    def __init__(self, software):
+        self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.args = self.parse_command_line_arguments()
         self.api_key = self.load_api_key(os.path.join(self.base_dir, 'code', f"{self.args.env}_API_key.txt"))
-        self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
         self.base_url = self.compose_base_url(self.args.env)
-        self.urns = self.load_activities(os.path.join(self.base_dir, 'data', f"{self.args.env}_activiteiten_waterschapsverordening.txt"))
+        self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
+        self.vendor = Vendor(software, self.args.env)
+        self.urns = self.vendor.urns
+        self.geo_variables = self.vendor.geo_names_by_index
         self.session = requests.Session()
-        self.sttr_url_by_name = {}
+        self.sttr_url_per_activity = {}
+        self.werkingsgebied_per_activity = {}
         self.excel_handler = ExcelHandler(self.base_dir, self.args.env, self.args.date)
-        
+
     @staticmethod
     def parse_command_line_arguments():
         parser = argparse.ArgumentParser(description="Process some environment settings and actions.")
@@ -26,7 +30,9 @@ class RTR:
         parser.add_argument('--date', type=str, default=datetime.now().strftime("%d-%m-%Y"),
                             help='Date in the format dd-mm-yyyy, default is today\'s date.')
         parser.add_argument('--sttr', action='store_true',
-                            help='Flag to log sttr files in .xml if present.')
+                            help='Flag to archive STTR files in .xml')
+        parser.add_argument('--location', action='store_true',
+                            help='Flag to archive werkingsgebieden per activity to .txt')
         args = parser.parse_args()
         return args
 
@@ -34,16 +40,6 @@ class RTR:
     def load_api_key(api_key_file):
         with open(api_key_file) as key_file:
             return key_file.read().strip()
-
-    @staticmethod
-    def load_activities(activities_file):
-        urns = []
-        with open(activities_file) as file:
-            for line in file:
-                activity = line.strip().split("\t")
-                if len(activity) < 8:
-                    urns.append(activity)
-        return urns
 
     def archive_activities(self):
         for row, activity in enumerate(self.urns, 2):
@@ -63,10 +59,51 @@ class RTR:
     def get_activity_data(self, uri):
         url = self.compose_activity_url(uri)
         response = self.session.get(url, headers=self.headers)
+        
         if response.ok:
+            self.update_werkingsgebied_per_activity(response.json())
             return response.json()
         print(f"Error fetching data for URI {uri}: {response.status_code}")
         return None
+    
+    def update_werkingsgebied_per_activity(self, json_data):
+        if self.args.location:
+            activity_description = self.extract_activity_description(json_data)
+            identifications = self.extract_identifications(json_data)
+            matched_descriptions = self.match_descriptions(identifications)
+            self.update_activity_mapping(activity_description, matched_descriptions)
+            self.write_werkingsgebieden_to_file()
+
+    def extract_activity_description(self, json_data):
+        return json_data.get('omschrijving', 'No description')
+
+    def extract_identifications(self, json_data):
+        return [loc['identificatie'] for loc in json_data.get('locaties', [])]
+
+    def match_descriptions(self, identifications):
+        matched_descriptions = []
+        for url in identifications:
+            description = self.get_description(url)
+            matched_descriptions.append(description)
+        return matched_descriptions
+
+    def get_description(self, url):
+        if url == 'nl.imow-ws0636.ambtsgebied.HDSR':
+            return 'ambtsgebied HDSR'
+        else:
+            index = url.split('.')[-1][-2:]
+            clean_index = index.lstrip('0')
+            return self.geo_variables.get(clean_index, f"null: {url}")
+
+    def update_activity_mapping(self, activity_description, matched_descriptions):
+        if activity_description in self.werkingsgebied_per_activity:
+            self.werkingsgebied_per_activity[activity_description].extend(matched_descriptions)
+        else:
+            self.werkingsgebied_per_activity[activity_description] = matched_descriptions
+
+    def write_werkingsgebieden_to_file(self):
+        file_path = self.create_file_path('log', f"werkingsgebieden_{self.args.env}_{self.args.date}.txt")
+        self.write_to_file(file_path, self.werkingsgebied_per_activity)
 
     @staticmethod
     def extract_werkzaamheden(data):
@@ -119,10 +156,9 @@ class RTR:
     def append_sttr_file(self, urn_name, regelbeheerobject_type, data):
         try:
             sttr_bestand_href = data['_embedded']['toepasbareRegels'][0]['_links']['sttrBestand']['href']
-            
             if regelbeheerobject_type != "null":
                 regelbeheerobject_name = urn_name + "_" + regelbeheerobject_type.replace(" ", "_")
-                self.sttr_url_by_name[regelbeheerobject_name] = sttr_bestand_href
+                self.sttr_url_per_activity[regelbeheerobject_name] = sttr_bestand_href
             
         except KeyError as e:
             identifier = self.extract_identifier(data)
@@ -138,11 +174,7 @@ class RTR:
 
     @staticmethod
     def compose_base_url(env):
-        if env == "prod":
-            return "https://service.omgevingswet.overheid.nl/publiek/toepasbare-regels/api"
-        if env == "pre":
-            return "https://service.pre.omgevingswet.overheid.nl/publiek/toepasbare-regels/api"
-        raise ValueError("Invalid environment specified")
+        return f"https://service{'' if env == 'prod' else '.pre'}.omgevingswet.overheid.nl/publiek/toepasbare-regels/api"
 
     def compose_activity_url(self, uri):
         return f"{self.base_url}/rtrgegevens/v2/activiteiten/{uri}?datum={self.args.date}"
@@ -158,13 +190,62 @@ class RTR:
         self.excel_handler.write_data_to_cells(row, data_to_write)
 
     def archive_sttr_files(self):
-        for key, url in self.sttr_url_by_name.items():
+        for key, url in self.sttr_url_per_activity.items():
             identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
             response = self.session.get(url, headers=self.headers)
-                         
             if response.status_code == 200:
-                with open(os.path.join(self.base_dir, 'log', f'STTR_RegelBeheerObjecten/STTR_{identifier}_{key}.xml'), 'w', encoding='utf-8') as file:
-                    file.write(response.text)
+                file_path = self.create_file_path('log/STTR_RegelBeheerObjecten', f'STTR_{identifier}_{key}.xml')
+                self.write_to_file(file_path, {key: [response.text]})
             else:
                 print(f"Failed to download data from {url}, status code: {response.status_code}")
 
+    def create_file_path(self, directory, filename):
+        return os.path.join(self.base_dir, directory, filename)
+
+    def write_to_file(self, file_path, data):
+        with open(file_path, 'w', encoding='utf-8') as file:
+            for key, values in data.items():
+                file.write(f"{key}\n")
+                for value in values:
+                    file.write(f"\t{value}\n")
+                file.write("\n")
+
+
+
+
+
+
+
+
+
+    # def fetch_location_details(self):
+    #     # Adjust the URL based on the specific object you are querying
+
+    #     #activiteitlocatieaanduidingen/_zoek
+    #     #gebiedsaanwijzingen/_zoek
+    #     #regelteksten/_zoek
+    #     #omgevingsnormen/_zoek
+    #     #omgevingswaarden/_zoek
+
+    #     gebieds_url = "https://service.omgevingswet.overheid.nl/publiek/omgevingsdocumenten/api/presenteren/v7/gebiedsaanwijzingen/_zoek"
+    #     headers = self.headers
+    #     headers['Content-Type'] = 'application/json'  # Ensure header includes Content-Type as application/json
+
+    #     # The body of the POST request with the specified zoekParameters
+    #     search_payload = {
+    #         "zoekParameters": [
+    #             {
+    #                 "parameter": "locatie.identificatie",
+    #                 "zoekWaarden": [
+    #                     "nl.imow-ws0636.gebied.2023000034"
+    #                     ]
+    #             }
+    #         ]
+    #     }
+
+    #     # Making the POST request
+    #     response = self.session.post(gebieds_url, headers=headers, json=search_payload)
+    #     if response.ok:
+    #         print('ok', response.json(), '\n')
+    #     else:
+    #         print(f"Failed to fetch data: {response.status_code} {response.text}")
