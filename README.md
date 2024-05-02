@@ -4,13 +4,15 @@ Via deze scripts kunnen gegevens uit de RTR worden opgevraagd en lokaal worden g
 
 ## Gebruik
 ```
---env prod/pre             # Selecteer de gewenste omgeving . . . . . . . standaard: prod
---date 01-01-2024          # Kies een datum . . . . . . . . . . . . . . . standaard: vandaag
---sttr                     # Archiveer de DMN logica per activiteit . . . standaard: uit
+--env prod/pre            # Selecteer de gewenste omgeving . . . . . . . standaard: prod
+--date 01-01-2024         # Kies een datum . . . . . . . . . . . . . . . standaard: vandaag
+--sttr                    # Archiveer de DMN logica per activiteit . . . standaard: uit
+--location                # Archiveer werkingsgebieden per activiteit. . standaard: uit
 
 voorbeeld: python.exe code/log_RTR_status_via_API.py
 voorbeeld: python.exe code/log_RTR_status_via_API.py --env pre --date 03-03-2024
 voorbeeld: python.exe code/log_RTR_status_via_API.py --env prod --date 12-04-2024 --sttr
+voorbeeld: python.exe code/log_RTR_status_via_API.py --location
 
 De volgorde van de flags maakt niet uit, als een flag niet word aangeroepen gebruikt die zijn standaard waarde.
 ```
