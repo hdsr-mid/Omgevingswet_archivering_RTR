@@ -16,7 +16,7 @@ class RTR:
         self.base_url = self.compose_base_url(self.args.env)
         self.vendor = Vendor(software, self.args.env)
         self.urns = self.vendor.urns
-        self.geo_variables = self.vendor.variable_names_by_index
+        self.geo_variables = self.vendor.geo_names_by_index
         self.session = requests.Session()
         self.sttr_url_per_activity = {}
         self.werkingsgebied_per_activity = {}
@@ -31,7 +31,9 @@ class RTR:
         parser.add_argument('--date', type=str, default=datetime.now().strftime("%d-%m-%Y"),
                             help='Date in the format dd-mm-yyyy, default is today\'s date.')
         parser.add_argument('--sttr', action='store_true',
-                            help='Flag to log sttr files in .xml if present.')
+                            help='Flag to archive STTR files in .xml')
+        parser.add_argument('--location', action='store_true',
+                            help='Flag to archive werkingsgebieden per activity to .txt')
         args = parser.parse_args()
         return args
 
@@ -65,13 +67,13 @@ class RTR:
         print(f"Error fetching data for URI {uri}: {response.status_code}")
         return None
     
-
     def update_werkingsgebied_per_activity(self, json_data):
-        activity_description = self.extract_activity_description(json_data)
-        identifications = self.extract_identifications(json_data)
-        matched_descriptions = self.match_descriptions(identifications)
-        self.update_activity_mapping(activity_description, matched_descriptions)
-        self.write_to_file()
+        if self.args.location:
+            activity_description = self.extract_activity_description(json_data)
+            identifications = self.extract_identifications(json_data)
+            matched_descriptions = self.match_descriptions(identifications)
+            self.update_activity_mapping(activity_description, matched_descriptions)
+            self.write_to_file()
 
     def extract_activity_description(self, json_data):
         return json_data.get('omschrijving', 'No description')
@@ -88,7 +90,7 @@ class RTR:
 
     def get_description(self, url):
         if url == 'nl.imow-ws0636.ambtsgebied.HDSR':
-            return 'Ambtsgebied HDSR'
+            return 'ambtsgebied HDSR'
         else:
             index = url.split('.')[-1][-2:]
             clean_index = index.lstrip('0')
@@ -101,14 +103,10 @@ class RTR:
             self.werkingsgebied_per_activity[activity_description] = matched_descriptions
 
     def write_to_file(self):
-        file_path = os.path.join(self.base_dir, 'log', "werkingsgebieden.txt")
+        file_path = os.path.join(self.base_dir, 'log', f"werkingsgebieden_{self.args.date}.txt")
         with open(file_path, 'w') as file:
             for key, values in self.werkingsgebied_per_activity.items():
                 file.write(f"{key}: {', '.join(values)}\n\n")
-
-
-
-
 
     @staticmethod
     def extract_werkzaamheden(data):
