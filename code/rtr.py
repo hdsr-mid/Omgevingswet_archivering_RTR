@@ -9,11 +9,11 @@ from vendor import Vendor
 
 class RTR:
     def __init__(self, software):
-        self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  
+        self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.args = self.parse_command_line_arguments()
         self.api_key = self.load_api_key(os.path.join(self.base_dir, 'code', f"{self.args.env}_API_key.txt"))
-        self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
         self.base_url = self.compose_base_url(self.args.env)
+        self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
         self.vendor = Vendor(software, self.args.env)
         self.urns = self.vendor.urns
         self.geo_variables = self.vendor.geo_names_by_index
@@ -21,8 +21,7 @@ class RTR:
         self.sttr_url_per_activity = {}
         self.werkingsgebied_per_activity = {}
         self.excel_handler = ExcelHandler(self.base_dir, self.args.env, self.args.date)
-        self.run_once = False
-        
+
     @staticmethod
     def parse_command_line_arguments():
         parser = argparse.ArgumentParser(description="Process some environment settings and actions.")
@@ -103,13 +102,8 @@ class RTR:
             self.werkingsgebied_per_activity[activity_description] = matched_descriptions
 
     def write_werkingsgebieden_to_file(self):
-        file_path = os.path.join(self.base_dir, 'log', f"werkingsgebieden_{self.args.date}.txt")
-        with open(file_path, 'w') as file:
-            for key, values in self.werkingsgebied_per_activity.items():
-                file.write(f"{key}\n")
-                for value in values:
-                    file.write(f"\t{value}\n")
-                file.write("\n")
+        file_path = self.create_file_path('log', f"werkingsgebieden_{self.args.date}.txt")
+        self.write_to_file(file_path, self.werkingsgebied_per_activity)
 
     @staticmethod
     def extract_werkzaamheden(data):
@@ -180,11 +174,7 @@ class RTR:
 
     @staticmethod
     def compose_base_url(env):
-        if env == "prod":
-            return "https://service.omgevingswet.overheid.nl/publiek/toepasbare-regels/api"
-        if env == "pre":
-            return "https://service.pre.omgevingswet.overheid.nl/publiek/toepasbare-regels/api"
-        raise ValueError("Invalid environment specified")
+        return f"https://service{'' if env == 'prod' else '.pre'}.omgevingswet.overheid.nl/publiek/toepasbare-regels/api"
 
     def compose_activity_url(self, uri):
         return f"{self.base_url}/rtrgegevens/v2/activiteiten/{uri}?datum={self.args.date}"
@@ -203,13 +193,22 @@ class RTR:
         for key, url in self.sttr_url_per_activity.items():
             identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
             response = self.session.get(url, headers=self.headers)
-                         
             if response.status_code == 200:
-                with open(os.path.join(self.base_dir, 'log', f'STTR_RegelBeheerObjecten/STTR_{identifier}_{key}.xml'), 'w', encoding='utf-8') as file:
-                    file.write(response.text)
+                file_path = self.create_file_path('log/STTR_RegelBeheerObjecten', f'STTR_{identifier}_{key}.xml')
+                self.write_to_file(file_path, {key: [response.text]})
             else:
                 print(f"Failed to download data from {url}, status code: {response.status_code}")
 
+    def create_file_path(self, directory, filename):
+        return os.path.join(self.base_dir, directory, filename)
+
+    def write_to_file(self, file_path, data):
+        with open(file_path, 'w', encoding='utf-8') as file:
+            for key, values in data.items():
+                file.write(f"{key}\n")
+                for value in values:
+                    file.write(f"\t{value}\n")
+                file.write("\n")
 
 
 
