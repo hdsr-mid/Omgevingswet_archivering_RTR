@@ -101,9 +101,19 @@ class RTR:
         else:
             self.werkingsgebied_per_activity[activity_description] = matched_descriptions
 
+    def invert_werkingsgebied_mapping(self):
+        gebied_to_activities = {}
+        for activity, gebieden in self.werkingsgebied_per_activity.items():
+            for gebied in gebieden:
+                if gebied not in gebied_to_activities:
+                    gebied_to_activities[gebied] = []
+                gebied_to_activities[gebied].append(activity)
+        return gebied_to_activities
+
     def write_werkingsgebieden_to_file(self):
         file_path = self.create_file_path('log', f"werkingsgebieden_{self.args.env}_{self.args.date}.txt")
-        self.write_to_file(file_path, self.werkingsgebied_per_activity)
+        gebied_to_activities = self.invert_werkingsgebied_mapping()
+        self.write_to_file(file_path, gebied_to_activities)
 
     @staticmethod
     def extract_werkzaamheden(data):
