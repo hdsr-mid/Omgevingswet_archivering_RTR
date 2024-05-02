@@ -73,7 +73,7 @@ class RTR:
             identifications = self.extract_identifications(json_data)
             matched_descriptions = self.match_descriptions(identifications)
             self.update_activity_mapping(activity_description, matched_descriptions)
-            self.write_to_file()
+            self.write_werkingsgebieden_to_file()
 
     def extract_activity_description(self, json_data):
         return json_data.get('omschrijving', 'No description')
@@ -102,11 +102,14 @@ class RTR:
         else:
             self.werkingsgebied_per_activity[activity_description] = matched_descriptions
 
-    def write_to_file(self):
+    def write_werkingsgebieden_to_file(self):
         file_path = os.path.join(self.base_dir, 'log', f"werkingsgebieden_{self.args.date}.txt")
         with open(file_path, 'w') as file:
             for key, values in self.werkingsgebied_per_activity.items():
-                file.write(f"{key}: {', '.join(values)}\n\n")
+                file.write(f"{key}\n")
+                for value in values:
+                    file.write(f"\t{value}\n")
+                file.write("\n")
 
     @staticmethod
     def extract_werkzaamheden(data):
