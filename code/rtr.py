@@ -102,7 +102,7 @@ class RTR:
             self.werkingsgebied_per_activity[activity_description] = matched_descriptions
 
     def write_werkingsgebieden_to_file(self):
-        file_path = self.create_file_path('log', f"werkingsgebieden_{self.args.date}.txt")
+        file_path = self.create_file_path('log', f"werkingsgebieden_{self.args.env}_{self.args.date}.txt")
         self.write_to_file(file_path, self.werkingsgebied_per_activity)
 
     @staticmethod
