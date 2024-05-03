@@ -71,11 +71,10 @@ class RTR:
         return None
     
     def update_werkingsgebied_per_activity(self, json_data):
-        if self.args.location:
-            activity_description = self.extract_activity_description(json_data)
-            identifications = self.extract_identifications(json_data)
-            matched_descriptions = self.match_descriptions(identifications)
-            self.update_activity_mapping(activity_description, matched_descriptions)
+        activity_description = self.extract_activity_description(json_data)
+        identifications = self.extract_identifications(json_data)
+        matched_descriptions = self.match_descriptions(identifications)
+        self.update_activity_mapping(activity_description, matched_descriptions)
 
     def extract_activity_description(self, json_data):
         return json_data.get('omschrijving', 'No description')
@@ -201,9 +200,12 @@ class RTR:
 
     def archive_activity_data(self, row, name, uri, activity_group, rule_reference, data):
         werkzaamheden = self.extract_werkzaamheden(data)
-        
         changes = self.fetch_and_process_changes(data)
-        data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes
+
+        werkingsgebieden = self.werkingsgebied_per_activity.get(name, [])
+        
+
+        data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes + werkingsgebieden
         self.excel_handler.write_data_to_cells(row, data_to_write)
 
     def archive_sttr_files(self):

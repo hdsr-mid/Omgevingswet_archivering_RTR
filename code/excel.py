@@ -36,6 +36,7 @@ class ExcelHandler:
             "Wijziging Melding",
             "Wijziging Aanvraag vergunning",
             "Wijziging Informatie",
+            "Werkingsgebieden",
         ]
         header_format = self.set_format('#DDDDDD', True, True)
         self.cell_format = self.set_format('white', False, False)
