@@ -3,6 +3,7 @@ from datetime import datetime
 import requests
 import argparse
 import urllib.parse
+from collections import OrderedDict
 
 from excel import ExcelHandler
 from vendor import Vendor
@@ -44,10 +45,13 @@ class RTR:
     def archive_activities(self):
         for row, activity in enumerate(self.urns, 2):
             self.process_activity(activity, row)
+        self.excel_handler.close_workbook()
         if self.args.sttr: 
             self.archive_sttr_files()
-        self.excel_handler.close_workbook()
-
+        if self.args.location:
+            self.sorted_gebied_to_activities = self.invert_werkingsgebied_mapping()
+            self.write_werkingsgebieden_to_file()
+        
     def process_activity(self, activity, row):
         name, _, uri, _, activity_group, rule_reference, _ = activity
         response_json = self.get_activity_data(uri)
@@ -72,7 +76,6 @@ class RTR:
             identifications = self.extract_identifications(json_data)
             matched_descriptions = self.match_descriptions(identifications)
             self.update_activity_mapping(activity_description, matched_descriptions)
-            self.write_werkingsgebieden_to_file()
 
     def extract_activity_description(self, json_data):
         return json_data.get('omschrijving', 'No description')
@@ -89,7 +92,7 @@ class RTR:
 
     def get_description(self, url):
         if url == 'nl.imow-ws0636.ambtsgebied.HDSR':
-            return 'ambtsgebied HDSR'
+            return 'Ambtsgebied HDSR'
         else:
             index = url.split('.')[-1][-2:]
             clean_index = index.lstrip('0')
@@ -108,7 +111,11 @@ class RTR:
                 if gebied not in gebied_to_activities:
                     gebied_to_activities[gebied] = []
                 gebied_to_activities[gebied].append(activity)
-        return gebied_to_activities
+        
+        for gebied in gebied_to_activities:
+            gebied_to_activities[gebied].sort()
+        sorted_gebied_to_activities = OrderedDict(sorted(gebied_to_activities.items()))
+        return sorted_gebied_to_activities
 
     def write_werkingsgebieden_to_file(self):
         file_path = self.create_file_path('log', f"werkingsgebieden_{self.args.env}_{self.args.date}.txt")
