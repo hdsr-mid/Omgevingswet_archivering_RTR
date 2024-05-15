@@ -3,9 +3,10 @@ import xlsxwriter
 from datetime import datetime
 
 class ExcelHandler:
-    def __init__(self, base_dir, env, date):
+    def __init__(self, base_dir, env, date, headers):
         self.workbook = None
         self.worksheet = None
+        self.headers = headers
         document_name = f"waterschapsverordening_RTR_{env}_status_{date}.xlsx"
         self.workbook_path = os.path.join(base_dir, f"log/{document_name}")
         self.setup_excel()
@@ -26,35 +27,30 @@ class ExcelHandler:
         })
 
     def prepare_worksheet(self):
-        headers = [
-            "Activiteit                   ",
-            "Uri",
-            "Activiteiten Groep",
-            "Regel",
-            "Werkzaamheden",
-            "Wijziging Conclusie",
-            "Wijziging Melding",
-            "Wijziging Aanvraag vergunning",
-            "Wijziging Informatie",
-            "Werkingsgebieden",
-        ]
         header_format = self.set_format('#DDDDDD', True, True)
         self.cell_format = self.set_format('white', False, False)
-        self.worksheet.write_row('A1', headers, header_format)
-        for i, header in enumerate(headers, 1):
-            self.worksheet.set_column(i - 1, i - 1, max(10, len(header)) + 2)
+        self.blue_format = self.set_format('#ADD8E6', False, False)
+        self.worksheet.write_row('A1', self.headers, header_format)
+
+        HEADERS_BEFORE_WERKINGSGEBIEDEN = 9
+        for i, header in enumerate(self.headers, 1):
+            column_width = 4 if i > HEADERS_BEFORE_WERKINGSGEBIEDEN else len(header) + 5
+            self.worksheet.set_column(i - 1, i - 1, column_width)
 
     def write_data_to_cells(self, row, data_to_write):
         col = 0
         for content in data_to_write:
-            try:
-                content_date = datetime.strptime(content, "%d-%m-%Y %H:%M:%S")
-                difference = datetime.now() - content_date
-                color = self.set_green_intensity(difference.days)
-                cell_format = self.set_format(color, False, False)
-                self.worksheet.write(row - 1, col, content, cell_format)
-            except ValueError:
-                self.worksheet.write(row - 1, col, content, self.cell_format)
+            if content == "1":
+                self.worksheet.write(row - 1, col, content, self.blue_format)
+            else:
+                try:
+                    content_date = datetime.strptime(content, "%d-%m-%Y %H:%M:%S")
+                    difference = datetime.now() - content_date
+                    color = self.set_green_intensity(difference.days)
+                    cell_format = self.set_format(color, False, False)
+                    self.worksheet.write(row - 1, col, content, cell_format)
+                except ValueError:
+                    self.worksheet.write(row - 1, col, content, self.cell_format)
             col += 1
     
     @staticmethod
