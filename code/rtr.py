@@ -230,19 +230,13 @@ class RTR:
         werkzaamheden = self.extract_werkzaamheden(data)
         changes = self.fetch_and_process_changes(data)
 
-        # Get the unique sorted list of all werkingsgebieden
         unique_werkingsgebieden = sorted(self.unique_werkingsgebieden)
-        # Map each werkingsgebied to an index
         werkingsgebieden_indices = {gebied: index for index, gebied in enumerate(unique_werkingsgebieden)}
-
-        # Initialize a list of zeroes with the same length as unique_werkingsgebieden
         activity_werkingsgebieden_presence = [0] * len(unique_werkingsgebieden)
 
-        # Set the corresponding indices to 1 for the current activity's werkingsgebieden
         for gebied in self.werkingsgebied_per_activity.get(name, []):
             activity_werkingsgebieden_presence[werkingsgebieden_indices[gebied]] = 1
 
-        # Replace 0 with an empty space and convert all elements to strings
         data_to_write = [
             str(item) if item != 0 else " " for item in 
             [name, uri, activity_group, rule_reference] + werkzaamheden + changes + activity_werkingsgebieden_presence
