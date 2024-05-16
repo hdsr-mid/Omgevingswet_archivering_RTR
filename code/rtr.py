@@ -44,11 +44,9 @@ class RTR:
             return key_file.read().strip()
 
     def archive_activities(self):
-        # First pass to collect all unique werkingsgebieden
         for activity in self.urns:
             self.collect_unique_werkingsgebieden(activity)
         
-        # Initialize ExcelHandler with dynamic headers
         headers = [
             "Activiteit                   ",
             "Uri",
@@ -62,7 +60,6 @@ class RTR:
         ] + sorted(self.unique_werkingsgebieden)
         self.excel_handler = ExcelHandler(self.base_dir, self.args.env, self.args.date, headers)
         
-        # Second pass to process activities and write data
         for row, activity in enumerate(self.urns, 2):
             self.process_activity(activity, row)
         
@@ -238,10 +235,6 @@ class RTR:
         for gebied in self.werkingsgebied_per_activity.get(name, []):
             activity_werkingsgebieden_presence[werkingsgebieden_indices[gebied]] = 1
             
-        #print(name.encode("utf-8"), activity_werkingsgebieden_presence)
-        #print()
-
-
         data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes + activity_werkingsgebieden_presence
         self.excel_handler.write_data_to_cells(row, data_to_write)
         

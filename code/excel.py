@@ -16,38 +16,42 @@ class ExcelHandler:
         self.worksheet = self.workbook.add_worksheet()
         self.prepare_worksheet()
 
-    def set_format(self, color, bold, text_wrap):
+    def set_format(self, color, bold, text_wrap, border):
         return self.workbook.add_format({
             'bg_color': color,
             'text_wrap': text_wrap,
             'align': 'left',
             'valign': 'top',
             'bold': bold,
-            'border': True,
+            'border': border,
         })
 
     def prepare_worksheet(self):
-        header_format = self.set_format('#DDDDDD', True, True)
-        self.cell_format = self.set_format('white', False, False)
-        self.blue_format = self.set_format('#ADD8E6', False, False)
+        header_format = self.set_format('#DDDDDD', True, False, True)
+        self.cell_format = self.set_format('white', False, False, True)
+        self.blue_format = self.set_format('#538DD5', False, False, True)
         self.worksheet.write_row('A1', self.headers, header_format)
 
         HEADERS_BEFORE_WERKINGSGEBIEDEN = 9
         for i, header in enumerate(self.headers, 1):
-            column_width = 4 if i > HEADERS_BEFORE_WERKINGSGEBIEDEN else len(header) + 5
+            padding = 4
+            column_width = 4 if i > HEADERS_BEFORE_WERKINGSGEBIEDEN else len(header) + padding
             self.worksheet.set_column(i - 1, i - 1, column_width)
+            
+        self.worksheet.freeze_panes(1,1)
 
     def write_data_to_cells(self, row, data_to_write):
         col = 0
         for content in data_to_write:
-            if content == "1":
-                self.worksheet.write(row - 1, col, content, self.blue_format)
+            if content == 1:
+                empty_string = " "
+                self.worksheet.write(row - 1, col, empty_string, self.blue_format)
             else:
                 try:
                     content_date = datetime.strptime(str(content), "%d-%m-%Y %H:%M:%S")
                     difference = datetime.now() - content_date
                     color = self.set_green_intensity(difference.days)
-                    cell_format = self.set_format(color, False, False)
+                    cell_format = self.set_format(color, False, False, True)
                     self.worksheet.write(row - 1, col, content, cell_format)
                 except ValueError:
                     self.worksheet.write(row - 1, col, content, self.cell_format)
