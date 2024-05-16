@@ -36,6 +36,7 @@ class ExcelHandler:
         for i, header in enumerate(self.headers, 1):
             column_width = 4 if i > HEADERS_BEFORE_WERKINGSGEBIEDEN else len(header) + 5
             self.worksheet.set_column(i - 1, i - 1, column_width)
+        self.worksheet.freeze_panes(1,0)
 
     def write_data_to_cells(self, row, data_to_write):
         col = 0
