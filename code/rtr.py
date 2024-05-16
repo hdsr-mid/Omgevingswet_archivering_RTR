@@ -82,9 +82,10 @@ class RTR:
     def process_activity(self, activity, row):
         name, _, uri, _, activity_group, rule_reference, _ = activity
         response_json = self.get_activity_data(uri)
+
         if response_json:
             self.archive_activity_data(
-                row, name, uri, activity_group, rule_reference, response_json
+                row, self.decodeSpecialChar(name), uri, activity_group, rule_reference, response_json
             )
 
     def get_activity_data(self, uri):
@@ -232,13 +233,17 @@ class RTR:
 
         unique_werkingsgebieden = sorted(self.unique_werkingsgebieden)
         werkingsgebieden_indices = {gebied: index for index, gebied in enumerate(unique_werkingsgebieden)}
-        activity_werkingsgebieden_presence = [0] * len(unique_werkingsgebieden)
+        activity_werkingsgebieden_presence = [" "] * len(unique_werkingsgebieden)
 
         for gebied in self.werkingsgebied_per_activity.get(name, []):
             activity_werkingsgebieden_presence[werkingsgebieden_indices[gebied]] = 1
+            
+        #print(name.encode("utf-8"), activity_werkingsgebieden_presence)
+        #print()
 
-        data_to_write = [
-            str(item) if item != 0 else " " for item in 
-            [name, uri, activity_group, rule_reference] + werkzaamheden + changes + activity_werkingsgebieden_presence
-        ]
+
+        data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes + activity_werkingsgebieden_presence
         self.excel_handler.write_data_to_cells(row, data_to_write)
+        
+    def decodeSpecialChar(self, string):
+        return string.encode("latin1").decode("utf-8")

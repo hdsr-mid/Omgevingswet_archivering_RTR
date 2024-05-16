@@ -44,7 +44,7 @@ class ExcelHandler:
                 self.worksheet.write(row - 1, col, content, self.blue_format)
             else:
                 try:
-                    content_date = datetime.strptime(content, "%d-%m-%Y %H:%M:%S")
+                    content_date = datetime.strptime(str(content), "%d-%m-%Y %H:%M:%S")
                     difference = datetime.now() - content_date
                     color = self.set_green_intensity(difference.days)
                     cell_format = self.set_format(color, False, False)
