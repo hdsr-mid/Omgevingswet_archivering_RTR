@@ -3,6 +3,7 @@ from datetime import datetime
 import requests
 import argparse
 import urllib.parse
+from collections import OrderedDict
 
 from excel import ExcelHandler
 from vendor import Vendor
@@ -20,7 +21,8 @@ class RTR:
         self.session = requests.Session()
         self.sttr_url_per_activity = {}
         self.werkingsgebied_per_activity = {}
-        self.excel_handler = ExcelHandler(self.base_dir, self.args.env, self.args.date)
+        self.unique_werkingsgebieden = set()
+        self.excel_handler = None
 
     @staticmethod
     def parse_command_line_arguments():
@@ -42,18 +44,45 @@ class RTR:
             return key_file.read().strip()
 
     def archive_activities(self):
+        for activity in self.urns:
+            self.collect_unique_werkingsgebieden(activity)
+        
+        headers = [
+            "Activiteit                   ",
+            "Uri",
+            "Activiteiten Groep",
+            "Regel",
+            "Werkzaamheden",
+            "Wijziging Conclusie",
+            "Wijziging Melding",
+            "Wijziging Aanvraag vergunning",
+            "Wijziging Informatie",
+        ] + sorted(self.unique_werkingsgebieden)
+        self.excel_handler = ExcelHandler(self.base_dir, self.args.env, self.args.date, headers)
+        
         for row, activity in enumerate(self.urns, 2):
             self.process_activity(activity, row)
-        if self.args.sttr: 
-            self.archive_sttr_files()
+        
         self.excel_handler.close_workbook()
+        if self.args.sttr:
+            self.archive_sttr_files()
+        if self.args.location:
+            self.sorted_gebied_to_activities = self.invert_werkingsgebied_mapping()
+            self.write_werkingsgebieden_to_file()
+
+    def collect_unique_werkingsgebieden(self, activity):
+        name, _, uri, _, _, _, _ = activity
+        response_json = self.get_activity_data(uri)
+        if response_json:
+            self.update_werkingsgebied_per_activity(response_json)
 
     def process_activity(self, activity, row):
         name, _, uri, _, activity_group, rule_reference, _ = activity
         response_json = self.get_activity_data(uri)
+
         if response_json:
             self.archive_activity_data(
-                row, name, uri, activity_group, rule_reference, response_json
+                row, self.decodeSpecialChar(name), uri, activity_group, rule_reference, response_json
             )
 
     def get_activity_data(self, uri):
@@ -67,12 +96,10 @@ class RTR:
         return None
     
     def update_werkingsgebied_per_activity(self, json_data):
-        if self.args.location:
-            activity_description = self.extract_activity_description(json_data)
-            identifications = self.extract_identifications(json_data)
-            matched_descriptions = self.match_descriptions(identifications)
-            self.update_activity_mapping(activity_description, matched_descriptions)
-            self.write_werkingsgebieden_to_file()
+        activity_description = self.extract_activity_description(json_data)
+        identifications = self.extract_identifications(json_data)
+        matched_descriptions = self.match_descriptions(identifications)
+        self.update_activity_mapping(activity_description, matched_descriptions)
 
     def extract_activity_description(self, json_data):
         return json_data.get('omschrijving', 'No description')
@@ -89,21 +116,36 @@ class RTR:
 
     def get_description(self, url):
         if url == 'nl.imow-ws0636.ambtsgebied.HDSR':
-            return 'ambtsgebied HDSR'
+            return 'Ambtsgebied HDSR'
         else:
             index = url.split('.')[-1][-2:]
             clean_index = index.lstrip('0')
             return self.geo_variables.get(clean_index, f"null: {url}")
 
     def update_activity_mapping(self, activity_description, matched_descriptions):
+        self.unique_werkingsgebieden.update(matched_descriptions)
         if activity_description in self.werkingsgebied_per_activity:
             self.werkingsgebied_per_activity[activity_description].extend(matched_descriptions)
         else:
             self.werkingsgebied_per_activity[activity_description] = matched_descriptions
 
+    def invert_werkingsgebied_mapping(self):
+        gebied_to_activities = {}
+        for activity, gebieden in self.werkingsgebied_per_activity.items():
+            for gebied in gebieden:
+                if gebied not in gebied_to_activities:
+                    gebied_to_activities[gebied] = []
+                gebied_to_activities[gebied].append(activity)
+        
+        for gebied in gebied_to_activities:
+            gebied_to_activities[gebied].sort()
+        sorted_gebied_to_activities = OrderedDict(sorted(gebied_to_activities.items()))
+        return sorted_gebied_to_activities
+
     def write_werkingsgebieden_to_file(self):
         file_path = self.create_file_path('log', f"werkingsgebieden_{self.args.env}_{self.args.date}.txt")
-        self.write_to_file(file_path, self.werkingsgebied_per_activity)
+        gebied_to_activities = self.invert_werkingsgebied_mapping()
+        self.write_to_file(file_path, gebied_to_activities)
 
     @staticmethod
     def extract_werkzaamheden(data):
@@ -184,68 +226,17 @@ class RTR:
 
     def archive_activity_data(self, row, name, uri, activity_group, rule_reference, data):
         werkzaamheden = self.extract_werkzaamheden(data)
-        
         changes = self.fetch_and_process_changes(data)
-        data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes
+
+        unique_werkingsgebieden = sorted(self.unique_werkingsgebieden)
+        werkingsgebieden_indices = {gebied: index for index, gebied in enumerate(unique_werkingsgebieden)}
+        activity_werkingsgebieden_presence = [" "] * len(unique_werkingsgebieden)
+
+        for gebied in self.werkingsgebied_per_activity.get(name, []):
+            activity_werkingsgebieden_presence[werkingsgebieden_indices[gebied]] = 1
+            
+        data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes + activity_werkingsgebieden_presence
         self.excel_handler.write_data_to_cells(row, data_to_write)
-
-    def archive_sttr_files(self):
-        for key, url in self.sttr_url_per_activity.items():
-            identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
-            response = self.session.get(url, headers=self.headers)
-            if response.status_code == 200:
-                file_path = self.create_file_path('log/STTR_RegelBeheerObjecten', f'STTR_{identifier}_{key}.xml')
-                self.write_to_file(file_path, {key: [response.text]})
-            else:
-                print(f"Failed to download data from {url}, status code: {response.status_code}")
-
-    def create_file_path(self, directory, filename):
-        return os.path.join(self.base_dir, directory, filename)
-
-    def write_to_file(self, file_path, data):
-        with open(file_path, 'w', encoding='utf-8') as file:
-            for key, values in data.items():
-                file.write(f"{key}\n")
-                for value in values:
-                    file.write(f"\t{value}\n")
-                file.write("\n")
-
-
-
-
-
-
-
-
-
-    # def fetch_location_details(self):
-    #     # Adjust the URL based on the specific object you are querying
-
-    #     #activiteitlocatieaanduidingen/_zoek
-    #     #gebiedsaanwijzingen/_zoek
-    #     #regelteksten/_zoek
-    #     #omgevingsnormen/_zoek
-    #     #omgevingswaarden/_zoek
-
-    #     gebieds_url = "https://service.omgevingswet.overheid.nl/publiek/omgevingsdocumenten/api/presenteren/v7/gebiedsaanwijzingen/_zoek"
-    #     headers = self.headers
-    #     headers['Content-Type'] = 'application/json'  # Ensure header includes Content-Type as application/json
-
-    #     # The body of the POST request with the specified zoekParameters
-    #     search_payload = {
-    #         "zoekParameters": [
-    #             {
-    #                 "parameter": "locatie.identificatie",
-    #                 "zoekWaarden": [
-    #                     "nl.imow-ws0636.gebied.2023000034"
-    #                     ]
-    #             }
-    #         ]
-    #     }
-
-    #     # Making the POST request
-    #     response = self.session.post(gebieds_url, headers=headers, json=search_payload)
-    #     if response.ok:
-    #         print('ok', response.json(), '\n')
-    #     else:
-    #         print(f"Failed to fetch data: {response.status_code} {response.text}")
+        
+    def decodeSpecialChar(self, string):
+        return string.encode("latin1").decode("utf-8")
