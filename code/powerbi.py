@@ -27,8 +27,8 @@ class PowerBIData:
         geo_names_by_index = {}
         filtered_locations = self.locations_sorted[self.locations_sorted["Bestuursorgaan"] == bestuursorgaan]
         for index, row in filtered_locations.iterrows():
-            line_number = str(row["noemer"]).strip()
-            name = str(row["identificatie"]).strip()
+            line_number = str(row["identificatie"]).strip()
+            name = str(row["omschrijving"]).strip()
             geo_names_by_index[line_number] = name
         return geo_names_by_index
 
@@ -36,9 +36,8 @@ class PowerBIData:
         urns = []
         filtered_urns = self.urns_sorted[self.urns_sorted["Bestuursorgaan"] == bestuursorgaan]
         for index, row in filtered_urns.iterrows():
-            activity = [str(row[col]) for col in filtered_urns.columns]
-            if len(activity) < 8:
-                urns.append(activity)
+            activity = [str(row["Bestuursorgaan"]), str(row["omschrijving"]), str(row["URN"])]
+            urns.append(activity)
         return urns
 
 if __name__ == "__main__":
