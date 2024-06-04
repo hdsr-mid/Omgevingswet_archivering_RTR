@@ -24,13 +24,23 @@ class PowerBIData:
         return locations_sorted
 
     def get_location_identifiers(self, bestuursorgaan):
-        identifiers = self.locations_sorted[self.locations_sorted["Bestuursorgaan"] == bestuursorgaan]["identificatie"]
-        return identifiers.dropna().unique().tolist()
+        geo_names_by_index = {}
+        filtered_locations = self.locations_sorted[self.locations_sorted["Bestuursorgaan"] == bestuursorgaan]
+        for index, row in filtered_locations.iterrows():
+            line_number = str(row["noemer"]).strip()
+            name = str(row["identificatie"]).strip()
+            geo_names_by_index[line_number] = name
+        return geo_names_by_index
 
     def get_urns(self, bestuursorgaan):
-        urns_list = self.urns_sorted[self.urns_sorted["Bestuursorgaan"] == bestuursorgaan]["URN"]
-        return urns_list.dropna().unique().tolist()
-    
+        urns = []
+        filtered_urns = self.urns_sorted[self.urns_sorted["Bestuursorgaan"] == bestuursorgaan]
+        for index, row in filtered_urns.iterrows():
+            activity = [str(row[col]) for col in filtered_urns.columns]
+            if len(activity) < 8:
+                urns.append(activity)
+        return urns
+
 if __name__ == "__main__":
     urn_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
                                  'data', 
@@ -40,9 +50,17 @@ if __name__ == "__main__":
                                       "A2. Welke locaties worden er gebruikt PROD.xlsx")
     data = PowerBIData(urn_file_path, location_file_path)
     
-    bestuursorgaan = "Wetterskip Fryslân"
-    print(f'locaties for {bestuursorgaan}:')
-    print(data.get_location_identifiers(bestuursorgaan))
-    print()
-    print(f'urns for {bestuursorgaan}:')
-    print(data.get_urns(bestuursorgaan))
+    bestuursorganen = ["Wetterskip Fryslân", "Hoogheemraadschap De Stichtse Rijnlanden"]
+    
+    for bestuursorgaan in bestuursorganen:
+        print(f'Locations for {bestuursorgaan}:')
+        locations = data.get_location_identifiers(bestuursorgaan)
+        for k, v in locations.items():
+            print(f"{k}: {v}")
+        
+        print()
+        print(f'URNs for {bestuursorgaan}:')
+        urns = data.get_urns(bestuursorgaan)
+        for urn in urns:
+            print(urn)
+        print()
