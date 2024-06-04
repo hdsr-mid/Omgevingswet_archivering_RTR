@@ -1,9 +1,11 @@
+import os
 import pandas as pd
 
 class PowerBIData:
     def __init__(self, urn_path, location_path):
         self.urn_path = urn_path
         self.location_path = location_path
+        self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.urns_sorted = self._load_and_prepare_urn_data()
         self.locations_sorted = self._load_and_prepare_location_data()
 
@@ -30,13 +32,17 @@ class PowerBIData:
         return urns_list.dropna().unique().tolist()
     
 if __name__ == "__main__":
-    data = PowerBIData(
-        r"D:\HDSR\Github\waterschapsverordening_log_RTR_status\data\A1. Welke activiteiten zijn gewijzigd PROD.xlsx",
-        r"D:\HDSR\Github\waterschapsverordening_log_RTR_status\data\A2. Welke locaties worden er gebruikt PROD.xlsx"
-    )
+    urn_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
+                                 'data', 
+                                 "A1. Welke activiteiten zijn gewijzigd PROD.xlsx")
+    location_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
+                                      'data', 
+                                      "A2. Welke locaties worden er gebruikt PROD.xlsx")
+    data = PowerBIData(urn_file_path, location_file_path)
     
-    print('locaties:')
-    print(data.get_location_identifiers("Wetterskip Fryslân"))
+    bestuursorgaan = "Wetterskip Fryslân"
+    print(f'locaties for {bestuursorgaan}:')
+    print(data.get_location_identifiers(bestuursorgaan))
     print()
-    print('urns')
-    print(data.get_urns("Wetterskip Fryslân"))
+    print(f'urns for {bestuursorgaan}:')
+    print(data.get_urns(bestuursorgaan))
