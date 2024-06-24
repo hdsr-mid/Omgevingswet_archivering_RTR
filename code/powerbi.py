@@ -26,11 +26,18 @@ class PowerBIData:
     def get_location_identifiers(self, bestuursorgaan):
         geo_names_by_index = {}
         filtered_locations = self.locations_sorted[self.locations_sorted["Bestuursorgaan"] == bestuursorgaan]
+        
         for index, row in filtered_locations.iterrows():
+            print(f"Row {index}:")
+            for col_name in row.index:
+                print(f"{col_name}: {row[col_name]}")
+            
             line_number = str(row["identificatie"]).strip()
             name = str(row["omschrijving"]).strip()
             geo_names_by_index[line_number] = name
+            
         return geo_names_by_index
+
 
     def get_urns(self, bestuursorgaan):
         urns = []
