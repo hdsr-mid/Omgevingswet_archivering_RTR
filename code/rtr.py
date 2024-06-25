@@ -215,6 +215,17 @@ class RTR:
             identifier = self.extract_identifier(data)
             print(f"Data missing key: '{e}'. Regelbeheerobject: {identifier}")
 
+    def archive_sttr_files(self):
+        for key, url in self.sttr_url_per_activity.items():
+            identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
+            response = self.session.get(url, headers=self.headers)
+                         
+            if response.status_code == 200:
+                with open(os.path.join(self.base_dir, 'log', f'STTR_RegelBeheerObjecten/STTR_{identifier}_{key}.xml'), 'w', encoding='utf-8') as file:
+                    file.write(response.text)
+            else:
+                print(f"Failed to download data from {url}, status code: {response.status_code}")
+
     def extract_identifier(self, data):
         try:
             url = data.get('_links', {}).get('self', {}).get('href', "")
