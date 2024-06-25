@@ -28,15 +28,15 @@ class PowerBIData:
         filtered_locations = self.locations_sorted[self.locations_sorted["Bestuursorgaan"] == bestuursorgaan]
         
         for index, row in filtered_locations.iterrows():
-            
             line_number = str(row["identificatie"]).strip()
             noemer = str(row["noemer"]).strip()
+            
             print(':')
             print(row)
             print(noemer)
             print('.')
             
-            if noemer != '\\N' and line_number not in geo_names_by_index:
+            if noemer and noemer != 'NaN' and line_number:
                 geo_names_by_index[line_number] = noemer
         
         return geo_names_by_index
@@ -50,8 +50,8 @@ class PowerBIData:
         print("bi")
         print(urns)
         return urns
-
 '''
+# Example usage
 if __name__ == "__main__":
     urn_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
                                  'data', 
@@ -61,7 +61,7 @@ if __name__ == "__main__":
                                       "A3. Wie gebruikt welke locaties (in STTR) PROD.xlsx")
     data = PowerBIData(urn_file_path, location_file_path)
     
-    bestuursorganen = ["Hoogheemraadschap De Stichtse Rijnlanden"] #"Wetterskip Fryslân", 
+    bestuursorganen = ["Wetterskip Fryslân", "Hoogheemraadschap De Stichtse Rijnlanden"]
     
     for bestuursorgaan in bestuursorganen:
         print(f'Locations for {bestuursorgaan}:')

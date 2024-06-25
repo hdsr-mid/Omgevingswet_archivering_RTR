@@ -16,8 +16,7 @@ class RTR:
         self.base_url = self.compose_base_url(self.args.env)
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
 
-        self.geo_variables = {}
-
+        self.bestuursorgaan = "Wetterskip Fryslân"
         self.urn_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
                                  'data', 
                                  "A1. Welke activiteiten zijn gewijzigd PROD.xlsx")
@@ -25,7 +24,9 @@ class RTR:
                                       'data', 
                                       "A3. Wie gebruikt welke locaties (in STTR) PROD.xlsx")
         self.powerbi = PowerBIData(self.urn_file_path, self.location_file_path)
-        self.urns2 = self.powerbi.get_urns("Wetterskip Fryslân") # Hoogheemraadschap De Stichtse Rijnlanden
+        self.urns2 = self.powerbi.get_urns(self.bestuursorgaan) # Hoogheemraadschap De Stichtse Rijnlanden
+        self.geo_variables = self.powerbi.get_location_identifiers(self.bestuursorgaan)
+
 
         self.session = requests.Session()
         self.sttr_url_per_activity = {}
