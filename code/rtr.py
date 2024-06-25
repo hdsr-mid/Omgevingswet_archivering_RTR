@@ -7,6 +7,7 @@ from collections import OrderedDict
 
 from excel import ExcelHandler
 from vendor import Vendor
+from powerbi import PowerBIData
 
 class RTR:
     def __init__(self, software):
@@ -15,9 +16,20 @@ class RTR:
         self.api_key = self.load_api_key(os.path.join(self.base_dir, 'code', f"{self.args.env}_API_key.txt"))
         self.base_url = self.compose_base_url(self.args.env)
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
+
         self.vendor = Vendor(software, self.args.env)
         self.urns = self.vendor.urns
         self.geo_variables = self.vendor.geo_names_by_index
+
+        self.urn_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
+                                 'data', 
+                                 "A1. Welke activiteiten zijn gewijzigd PROD.xlsx")
+        self.location_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
+                                      'data', 
+                                      "A3. Wie gebruikt welke locaties (in STTR) PROD.xlsx")
+        self.powerbi = PowerBIData(self.urn_file_path, self.location_file_path)
+        self.urns2 = self.powerbi.get_urns("Hoogheemraadschap De Stichtse Rijnlanden")
+
         self.session = requests.Session()
         self.sttr_url_per_activity = {}
         self.werkingsgebied_per_activity = {}
@@ -45,6 +57,7 @@ class RTR:
 
     def archive_activities(self):
         for activity in self.urns:
+            print(activity)
             self.collect_unique_werkingsgebieden(activity)
         
         headers = [

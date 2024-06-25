@@ -41,17 +41,16 @@ class PowerBIData:
         
         return geo_names_by_index
 
-
-
-
     def get_urns(self, bestuursorgaan):
         urns = []
         filtered_urns = self.urns_sorted[self.urns_sorted["Bestuursorgaan"] == bestuursorgaan]
         for index, row in filtered_urns.iterrows():
             activity = [str(row["Bestuursorgaan"]), str(row["omschrijving"]), str(row["URN"])]
             urns.append(activity)
+            print(activity)
         return urns
 
+'''
 if __name__ == "__main__":
     urn_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
                                  'data', 
@@ -75,4 +74,4 @@ if __name__ == "__main__":
         for urn in urns:
             print(urn)
         print()
-    
+'''
