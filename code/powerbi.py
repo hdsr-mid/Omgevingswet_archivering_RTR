@@ -47,7 +47,8 @@ class PowerBIData:
         for index, row in filtered_urns.iterrows():
             activity = [str(row["Bestuursorgaan"]), str(row["omschrijving"]), str(row["URN"])]
             urns.append(activity)
-            print(activity)
+        print("bi")
+        print(urns)
         return urns
 
 '''

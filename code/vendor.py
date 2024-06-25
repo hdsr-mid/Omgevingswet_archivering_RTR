@@ -20,6 +20,8 @@ class Vendor:
                 activity = line.strip().split("\t")
                 if len(activity) < 8:
                     urns.append(activity)
+        print("vendor")
+        print(urns)
         return urns
     
     def load_geo_frame(self, geo_frame_file):
