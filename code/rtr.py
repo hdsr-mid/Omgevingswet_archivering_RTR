@@ -56,15 +56,13 @@ class RTR:
             return key_file.read().strip()
 
     def archive_activities(self):
-        for activity in self.urns:
+        for activity in self.urns2:
             print(activity)
             self.collect_unique_werkingsgebieden(activity)
         
         headers = [
             "Activiteit                   ",
             "Uri",
-            "Activiteiten Groep",
-            "Regel",
             "Werkzaamheden",
             "Wijziging Conclusie",
             "Wijziging Melding",
@@ -73,7 +71,7 @@ class RTR:
         ] + sorted(self.unique_werkingsgebieden)
         self.excel_handler = ExcelHandler(self.base_dir, self.args.env, self.args.date, headers)
         
-        for row, activity in enumerate(self.urns, 2):
+        for row, activity in enumerate(self.urns2, 2):
             self.process_activity(activity, row)
         
         self.excel_handler.close_workbook()
@@ -84,19 +82,17 @@ class RTR:
             self.write_werkingsgebieden_to_file()
 
     def collect_unique_werkingsgebieden(self, activity):
-        name, _, uri, _, _, _, _ = activity
+        government, name, uri = activity
         response_json = self.get_activity_data(uri)
         if response_json:
             self.update_werkingsgebied_per_activity(response_json)
 
     def process_activity(self, activity, row):
-        name, _, uri, _, activity_group, rule_reference, _ = activity
+        government, name, uri = activity
         response_json = self.get_activity_data(uri)
 
         if response_json:
-            self.archive_activity_data(
-                row, self.decodeSpecialChar(name), uri, activity_group, rule_reference, response_json
-            )
+            self.archive_activity_data(row, name, uri, response_json)
 
     def get_activity_data(self, uri):
         url = self.compose_activity_url(uri)
@@ -237,7 +233,7 @@ class RTR:
     def compose_regel_beheer_object_url(self, functional_structure_reference):
         return f"{self.base_url}/toepasbareregelsuitvoerengegevens/v1/toepasbareRegels?functioneleStructuurRef={functional_structure_reference}&datum={self.args.date}"
 
-    def archive_activity_data(self, row, name, uri, activity_group, rule_reference, data):
+    def archive_activity_data(self, row, name, uri, data):
         werkzaamheden = self.extract_werkzaamheden(data)
         changes = self.fetch_and_process_changes(data)
 
@@ -248,7 +244,7 @@ class RTR:
         for gebied in self.werkingsgebied_per_activity.get(name, []):
             activity_werkingsgebieden_presence[werkingsgebieden_indices[gebied]] = 1
             
-        data_to_write = [name, uri, activity_group, rule_reference] + werkzaamheden + changes + activity_werkingsgebieden_presence
+        data_to_write = [name, uri] + werkzaamheden + changes + activity_werkingsgebieden_presence
         self.excel_handler.write_data_to_cells(row, data_to_write)
         
     def decodeSpecialChar(self, string):
