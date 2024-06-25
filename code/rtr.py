@@ -6,20 +6,17 @@ import urllib.parse
 from collections import OrderedDict
 
 from excel import ExcelHandler
-from vendor import Vendor
 from powerbi import PowerBIData
 
 class RTR:
-    def __init__(self, software):
+    def __init__(self):
         self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.args = self.parse_command_line_arguments()
         self.api_key = self.load_api_key(os.path.join(self.base_dir, 'code', f"{self.args.env}_API_key.txt"))
         self.base_url = self.compose_base_url(self.args.env)
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
 
-        self.vendor = Vendor(software, self.args.env)
-        self.urns = self.vendor.urns
-        self.geo_variables = self.vendor.geo_names_by_index
+        self.geo_variables = {}
 
         self.urn_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
                                  'data', 
@@ -28,7 +25,7 @@ class RTR:
                                       'data', 
                                       "A3. Wie gebruikt welke locaties (in STTR) PROD.xlsx")
         self.powerbi = PowerBIData(self.urn_file_path, self.location_file_path)
-        self.urns2 = self.powerbi.get_urns("Hoogheemraadschap De Stichtse Rijnlanden")
+        self.urns2 = self.powerbi.get_urns("Wetterskip Fryslân") # Hoogheemraadschap De Stichtse Rijnlanden
 
         self.session = requests.Session()
         self.sttr_url_per_activity = {}
@@ -216,15 +213,20 @@ class RTR:
             print(f"Data missing key: '{e}'. Regelbeheerobject: {identifier}")
 
     def archive_sttr_files(self):
-        for key, url in self.sttr_url_per_activity.items():
-            identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
-            response = self.session.get(url, headers=self.headers)
-                         
-            if response.status_code == 200:
-                with open(os.path.join(self.base_dir, 'log', f'STTR_RegelBeheerObjecten/STTR_{identifier}_{key}.xml'), 'w', encoding='utf-8') as file:
-                    file.write(response.text)
-            else:
-                print(f"Failed to download data from {url}, status code: {response.status_code}")
+            log_dir = os.path.join(self.base_dir, 'log', 'STTR_RegelBeheerObjecten')
+            
+            os.makedirs(log_dir, exist_ok=True)
+            
+            for key, url in self.sttr_url_per_activity.items():
+                identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
+                response = self.session.get(url, headers=self.headers)
+                
+                if response.status_code == 200:
+                    file_path = os.path.join(log_dir, f'STTR_{identifier}_{key}.xml')
+                    with open(file_path, 'w', encoding='utf-8') as file:
+                        file.write(response.text)
+                else:
+                    print(f"Failed to download data from {url}, status code: {response.status_code}")
 
     def extract_identifier(self, data):
         try:
