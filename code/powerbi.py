@@ -28,16 +28,17 @@ class PowerBIData:
         filtered_locations = self.locations_sorted[self.locations_sorted["Bestuursorgaan"] == bestuursorgaan]
         
         for index, row in filtered_locations.iterrows():
-            line_number = str(row["identificatie"]).strip()
+            line_number = str(row["locatieIdentificatie"]).strip()
             noemer = str(row["noemer"]).strip()
             
             print(':')
             print(row)
-            print(noemer)
-            print('.')
+            print(',')
             
             if noemer and noemer != 'NaN' and line_number:
                 geo_names_by_index[line_number] = noemer
+                print(noemer, line_number)
+            print('.')
         
         return geo_names_by_index
 
