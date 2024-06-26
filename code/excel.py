@@ -7,7 +7,7 @@ class ExcelHandler:
         self.workbook = None
         self.worksheet = None
         self.headers = headers
-        document_name = f"{bestuursorgaan}_waterschapsverordening_RTR_{env}_status_{date}.xlsx"
+        document_name = f"{bestuursorgaan.replace(" ", "_")}_waterschapsverordening_RTR_{env}_status_{date}.xlsx"
         self.workbook_path = os.path.join(base_dir, f"log/{document_name}")
         self.setup_excel()
 
