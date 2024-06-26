@@ -9,14 +9,14 @@ from excel import ExcelHandler
 from powerbi import PowerBIData
 
 class RTR:
-    def __init__(self):
+    def __init__(self, bestuursorgaan):
         self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.args = self.parse_command_line_arguments()
         self.api_key = self.load_api_key(os.path.join(self.base_dir, 'code', f"{self.args.env}_API_key.txt"))
         self.base_url = self.compose_base_url(self.args.env)
+        self.bestuursorgaan = bestuursorgaan
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
 
-        self.bestuursorgaan = "Wetterskip Fryslân"
         self.urn_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
                                  'data', 
                                  "A1. Welke activiteiten zijn gewijzigd PROD.xlsx")
@@ -24,7 +24,7 @@ class RTR:
                                       'data', 
                                       "A3. Wie gebruikt welke locaties (in STTR) PROD.xlsx")
         self.powerbi = PowerBIData(self.urn_file_path, self.location_file_path)
-        self.urns2 = self.powerbi.get_urns(self.bestuursorgaan) # Hoogheemraadschap De Stichtse Rijnlanden
+        self.urns2 = self.powerbi.get_urns(self.bestuursorgaan) 
         self.geo_variables = self.powerbi.get_location_identifiers(self.bestuursorgaan)
 
 
@@ -60,14 +60,14 @@ class RTR:
         
         headers = [
             "Activiteit                   ",
-            "Uri",
+            "Urn",
             "Werkzaamheden",
             "Wijziging Conclusie",
             "Wijziging Melding",
             "Wijziging Aanvraag vergunning",
             "Wijziging Informatie",
         ] + sorted(self.unique_werkingsgebieden)
-        self.excel_handler = ExcelHandler(self.base_dir, self.args.env, self.args.date, headers)
+        self.excel_handler = ExcelHandler(self.bestuursorgaan, self.base_dir, self.args.env, self.args.date, headers)
         
         for row, activity in enumerate(self.urns2, 2):
             self.process_activity(activity, row)
