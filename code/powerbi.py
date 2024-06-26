@@ -18,7 +18,7 @@ class PowerBIData:
 
     def _load_and_prepare_location_data(self):
         location_excel = pd.read_excel(self.location_path)
-        locations = pd.DataFrame(location_excel, columns=["Bestuursorgaan", "omschrijving", "noemer", "identificatie"])
+        locations = pd.DataFrame(location_excel, columns=["Bestuursorgaan", "omschrijving", "noemer", "identificatie", "locatieIdentificatie"])
         locations_sorted = locations.sort_values(by="Bestuursorgaan")
         locations_sorted.reset_index(drop=True, inplace=True)
         return locations_sorted
@@ -47,8 +47,6 @@ class PowerBIData:
         for index, row in filtered_urns.iterrows():
             activity = [str(row["Bestuursorgaan"]), str(row["omschrijving"]), str(row["URN"])]
             urns.append(activity)
-        print("bi")
-        print(urns)
         return urns
 '''
 # Example usage
