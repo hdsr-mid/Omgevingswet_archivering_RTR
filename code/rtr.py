@@ -16,7 +16,6 @@ class RTR:
         self.base_url = self.compose_base_url(self.args.env)
         self.bestuursorgaan = bestuursorgaan
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
-
         self.urn_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
                                  'data', 
                                  "A1. Welke activiteiten zijn gewijzigd PROD.xlsx")
@@ -24,10 +23,8 @@ class RTR:
                                       'data', 
                                       "A3. Wie gebruikt welke locaties (in STTR) PROD.xlsx")
         self.powerbi = PowerBIData(self.urn_file_path, self.location_file_path)
-        self.urns2 = self.powerbi.get_urns(self.bestuursorgaan) 
+        self.urns = self.powerbi.get_urns(self.bestuursorgaan) 
         self.geo_variables = self.powerbi.get_location_identifiers(self.bestuursorgaan)
-
-
         self.session = requests.Session()
         self.sttr_url_per_activity = {}
         self.werkingsgebied_per_activity = {}
@@ -54,7 +51,7 @@ class RTR:
             return key_file.read().strip()
 
     def archive_activities(self):
-        for activity in self.urns2:
+        for activity in self.urns:
             print(activity)
             self.collect_unique_werkingsgebieden(activity)
         
@@ -69,7 +66,7 @@ class RTR:
         ] + sorted(self.unique_werkingsgebieden)
         self.excel_handler = ExcelHandler(self.bestuursorgaan, self.base_dir, self.args.env, self.args.date, headers)
         
-        for row, activity in enumerate(self.urns2, 2):
+        for row, activity in enumerate(self.urns, 2):
             self.process_activity(activity, row)
         
         self.excel_handler.close_workbook()
