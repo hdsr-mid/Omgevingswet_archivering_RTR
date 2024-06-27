@@ -122,17 +122,12 @@ class RTR:
         return matched_descriptions
 
     def get_description(self, url):
-        if url == 'nl.imow-ws0636.ambtsgebied.HDSR':
-            return 'Ambtsgebied HDSR'
+        if self.geo_variables.get(url) != None:
+            return self.geo_variables.get(url)
+        elif "ambtsgebied" in url:
+            return 'Ambtsgebied'
         else:
-            index = url.split('.')[-1][-2:]
-            clean_index = index.lstrip('0')
-            
-            print(url, clean_index, self.geo_variables.get(url), type( self.geo_variables.get(url)))
-            if self.geo_variables.get(url) != None:
-                return self.geo_variables.get(url)
-            else:
-                return url
+            return url
             
     def update_activity_mapping(self, activity_description, matched_descriptions):
         self.unique_werkingsgebieden.update(matched_descriptions)
@@ -165,7 +160,8 @@ class RTR:
         if "werkzaamheden" in data["_links"]:
             for werkzaamheid in data["_links"]["werkzaamheden"]:
                 extracted_id = werkzaamheid["href"].split("/")[(-1)]
-                werkzaamheden_list.append(extracted_id)
+                clean_id = extracted_id.split("?")[0]
+                werkzaamheden_list.append(clean_id)
         return [', '.join(werkzaamheden_list)] if werkzaamheden_list else [""]
 
     def fetch_and_process_changes(self, data):
