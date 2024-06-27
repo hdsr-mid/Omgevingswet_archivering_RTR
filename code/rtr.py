@@ -128,11 +128,12 @@ class RTR:
             index = url.split('.')[-1][-2:]
             clean_index = index.lstrip('0')
             
-            print(index, clean_index)
-            print(self.geo_variables.get(clean_index))
-
-            return self.geo_variables.get(clean_index, f"null: {url}")
-
+            print(url, clean_index, self.geo_variables.get(url), type( self.geo_variables.get(url)))
+            if self.geo_variables.get(url) != None:
+                return self.geo_variables.get(url)
+            else:
+                return url
+            
     def update_activity_mapping(self, activity_description, matched_descriptions):
         self.unique_werkingsgebieden.update(matched_descriptions)
         if activity_description in self.werkingsgebied_per_activity:
