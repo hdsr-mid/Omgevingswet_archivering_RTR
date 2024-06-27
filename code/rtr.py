@@ -9,12 +9,11 @@ from powerbi import PowerBIData
 from commands import ArgumentParser  
 
 class RTR:
-    def __init__(self, bestuursorgaan):
+    def __init__(self, args):
         self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        self.args = ArgumentParser.parse_command_line_arguments()  
+        self.args = args  
         self.api_key = self.load_api_key(os.path.join(self.base_dir, 'data', f"{self.args.env}_API_key.txt"))
         self.base_url = self.compose_base_url(self.args.env)
-        self.bestuursorgaan = bestuursorgaan
         self.powerbi_env = "PRE" if self.args.env == "pre" else "PROD"
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
         self.urn_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
@@ -24,8 +23,8 @@ class RTR:
                                 'data', 
                                 f"A3. Wie gebruikt welke locaties (in STTR) {self.powerbi_env}.xlsx")
         self.powerbi = PowerBIData(self.urn_file_path, self.location_file_path)
-        self.urns = self.powerbi.get_urns(self.bestuursorgaan) 
-        self.geo_variables = self.powerbi.get_location_identifiers(self.bestuursorgaan)
+        self.urns = self.powerbi.get_urns(self.args.overheid) 
+        self.geo_variables = self.powerbi.get_location_identifiers(self.args.overheid)
         self.session = requests.Session()
         self.sttr_url_per_activity = {}
         self.werkingsgebied_per_activity = {}
@@ -51,7 +50,7 @@ class RTR:
             "Wijziging Aanvraag vergunning",
             "Wijziging Informatie",
         ] + sorted(self.unique_werkingsgebieden)
-        self.excel_handler = ExcelHandler(self.bestuursorgaan, self.base_dir, self.args.env, self.args.date, headers)
+        self.excel_handler = ExcelHandler(self.args.overheid, self.base_dir, self.args.env, self.args.date, headers)
         
         for row, activity in enumerate(self.urns, 2):
             self.process_activity(activity, row)
@@ -136,7 +135,7 @@ class RTR:
         return sorted_gebied_to_activities
 
     def write_werkingsgebieden_to_file(self):      
-        file_path = self.create_file_path('log', f"{self.bestuursorgaan.replace(' ', '_')}_waterschapsverordening_werkingsgebieden_{self.args.env}_{self.args.date}.txt")
+        file_path = self.create_file_path('log', f"{self.args.overheid.replace(' ', '_')}_waterschapsverordening_werkingsgebieden_{self.args.env}_{self.args.date}.txt")
         gebied_to_activities = self.invert_werkingsgebied_mapping()
         self.write_to_file(file_path, gebied_to_activities)
 
