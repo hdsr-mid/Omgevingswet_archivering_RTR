@@ -1,8 +1,9 @@
 from rtr import RTR
+from commands import ArgumentParser  
 
 def main():
-    bestuursorgaan = "Hoogheemraadschap De Stichtse Rijnlanden" # Wetterskip Fryslân / Waterschap Vechtstromen / Hoogheemraadschap De Stichtse Rijnlanden
-    RTR(bestuursorgaan).archive_activities()
+    args = ArgumentParser.parse_command_line_arguments()
+    (args.overheid).archive_activities()
 
 if __name__ == "__main__":
     main()
