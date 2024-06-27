@@ -3,11 +3,11 @@ import xlsxwriter
 from datetime import datetime
 
 class ExcelHandler:
-    def __init__(self, base_dir, env, date, headers):
+    def __init__(self, bestuursorgaan, base_dir, env, date, headers):
         self.workbook = None
         self.worksheet = None
         self.headers = headers
-        document_name = f"waterschapsverordening_RTR_{env}_status_{date}.xlsx"
+        document_name = f'{bestuursorgaan.replace(" ", "_")}_waterschapsverordening_RTR_{env}_status_{date}.xlsx'
         self.workbook_path = os.path.join(base_dir, f"log/{document_name}")
         self.setup_excel()
 
