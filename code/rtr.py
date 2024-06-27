@@ -7,21 +7,23 @@ from collections import OrderedDict
 
 from excel import ExcelHandler
 from powerbi import PowerBIData
+from commands import ArgumentParser  
 
 class RTR:
     def __init__(self, bestuursorgaan):
         self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        self.args = self.parse_command_line_arguments()
+        self.args = ArgumentParser.parse_command_line_arguments()  
         self.api_key = self.load_api_key(os.path.join(self.base_dir, 'code', f"{self.args.env}_API_key.txt"))
         self.base_url = self.compose_base_url(self.args.env)
         self.bestuursorgaan = bestuursorgaan
+        self.powerbi_env = "PRE" if self.args.env == "pre" else "PROD"
         self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
         self.urn_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
                                  'data', 
-                                 "A1. Welke activiteiten zijn gewijzigd PROD.xlsx")
+                                 f"A1. Welke activiteiten zijn gewijzigd {self.powerbi_env}.xlsx")
         self.location_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
-                                      'data', 
-                                      "A3. Wie gebruikt welke locaties (in STTR) PROD.xlsx")
+                                'data', 
+                                f"A3. Wie gebruikt welke locaties (in STTR) {self.powerbi_env}.xlsx")
         self.powerbi = PowerBIData(self.urn_file_path, self.location_file_path)
         self.urns = self.powerbi.get_urns(self.bestuursorgaan) 
         self.geo_variables = self.powerbi.get_location_identifiers(self.bestuursorgaan)
@@ -138,18 +140,37 @@ class RTR:
         for activity, gebieden in self.werkingsgebied_per_activity.items():
             for gebied in gebieden:
                 if gebied not in gebied_to_activities:
-                    gebied_to_activities[gebied] = []
-                gebied_to_activities[gebied].append(activity)
+                    gebied_to_activities[gebied] = set()  # Use a set to avoid duplicates
+                gebied_to_activities[gebied].add(activity)
         
+        # Convert the sets back to lists and sort them
         for gebied in gebied_to_activities:
-            gebied_to_activities[gebied].sort()
+            gebied_to_activities[gebied] = sorted(gebied_to_activities[gebied])
+        
         sorted_gebied_to_activities = OrderedDict(sorted(gebied_to_activities.items()))
         return sorted_gebied_to_activities
 
-    def write_werkingsgebieden_to_file(self):
-        file_path = self.create_file_path('log', f"werkingsgebieden_{self.args.env}_{self.args.date}.txt")
+    def write_werkingsgebieden_to_file(self):      
+        file_path = self.create_file_path('log', f"{self.bestuursorgaan.replace(' ', '_')}_waterschapsverordening_werkingsgebieden_{self.args.env}_{self.args.date}.txt")
         gebied_to_activities = self.invert_werkingsgebied_mapping()
         self.write_to_file(file_path, gebied_to_activities)
+
+    def create_file_path(self, directory, filename):
+        # Ensure the directory exists
+        dir_path = os.path.join(self.base_dir, directory)
+        os.makedirs(dir_path, exist_ok=True)
+        
+        # Create the full file path
+        file_path = os.path.join(dir_path, filename)
+        return file_path
+
+    def write_to_file(self, file_path, data):
+        with open(file_path, 'w', encoding='utf-8') as file:
+            for key, values in data.items():
+                file.write(f"{key}:\n")
+                for value in values:
+                    file.write(f"  - {value}\n")
+                file.write("\n")
 
     @staticmethod
     def extract_werkzaamheden(data):
