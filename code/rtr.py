@@ -9,8 +9,8 @@ from commands import ArgumentParser
 
 class RTR:
     def __init__(self, args):
-        self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        self.args = args  
+        self.args = args 
+        self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
         self.api_key = self.load_api_key(os.path.join(self.base_dir, 'data', f"{self.args.env}_API_key.txt"))
         self.base_url = self.compose_base_url(self.args.env)
         self.powerbi_env = "PRE" if self.args.env == "pre" else "PROD"
