@@ -32,7 +32,7 @@ class ExcelHandler:
         self.blue_format = self.set_format('#538DD5', False, False, True)
         self.worksheet.write_row('A1', self.headers, header_format)
 
-        HEADERS_BEFORE_WERKINGSGEBIEDEN = 9
+        HEADERS_BEFORE_WERKINGSGEBIEDEN = 10
         for i, header in enumerate(self.headers, 1):
             padding = 4
             column_width = 4 if i > HEADERS_BEFORE_WERKINGSGEBIEDEN else len(header) + padding
@@ -43,7 +43,7 @@ class ExcelHandler:
     def write_data_to_cells(self, row, data_to_write):
         col = 0
         for content in data_to_write:
-            if content == 1:
+            if content == 1 and col != 2:
                 empty_string = " "
                 self.worksheet.write(row - 1, col, empty_string, self.blue_format)
             else:
