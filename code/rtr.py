@@ -14,13 +14,21 @@ class RTR:
         self.api_key = self.load_api_key(os.path.join(self.base_dir, 'data', f"{self.args.env}_API_key.txt"))
         self.base_url = self.compose_base_url(self.args.env)
         self.powerbi_env = "PRE" if self.args.env == "pre" else "PROD"
-        self.headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
+        self.session_headers = {'Accept': 'application/hal+json, application/xml', 'x-api-key': self.api_key}
         self.urn_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
                                  'data', 
                                  f"A1. Welke activiteiten zijn gewijzigd {self.powerbi_env}.xlsx")
         self.location_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
                                 'data', 
                                 f"A3. Wie gebruikt welke locaties (in STTR) {self.powerbi_env}.xlsx")
+        self.headers = ["Activiteit                   ",
+                        "Urn",              
+                        "Aantal",
+                        "Werkzaamheden",          
+                        "Wijziging Conclusie",
+                        "Wijziging Melding",
+                        "Wijziging Aanvraag vergunning",
+                        "Wijziging Informatie"  ]
         self.powerbi = PowerBIData(self.urn_file_path, self.location_file_path)
         self.urns = self.powerbi.get_urns(self.args.overheid) 
         self.geo_variables = self.powerbi.get_location_identifiers(self.args.overheid)
@@ -40,16 +48,7 @@ class RTR:
             print(activity)
             self.collect_unique_werkingsgebieden(activity)
         
-        headers = [
-            "Activiteit                   ",
-            "Urn",              
-            "Aantal werkzaamheden",
-            "Werkzaamheden",          
-            "Wijziging Conclusie",
-            "Wijziging Melding",
-            "Wijziging Aanvraag vergunning",
-            "Wijziging Informatie",
-        ] + sorted(self.unique_werkingsgebieden)
+        headers = self.headers + sorted(self.unique_werkingsgebieden)
         self.excel_handler = ExcelHandler(self.args.overheid, self.base_dir, self.args.env, self.args.date, headers)
         
         for row, activity in enumerate(self.urns, 2):
@@ -77,7 +76,7 @@ class RTR:
 
     def get_activity_data(self, uri):
         url = self.compose_activity_url(uri)
-        response = self.session.get(url, headers=self.headers)
+        response = self.session.get(url, headers=self.session_headers)
         
         if response.ok:
             self.update_werkingsgebied_per_activity(response.json())
@@ -191,7 +190,7 @@ class RTR:
     
     def get_regelbeheerobject(self, urn_name, object_type, functional_structure_reference):
         url = self.compose_regel_beheer_object_url(functional_structure_reference)
-        response = self.session.get(url, headers=self.headers)
+        response = self.session.get(url, headers=self.session_headers)
 
         if response.ok:
             data = response.json()
@@ -225,7 +224,7 @@ class RTR:
             
             for key, url in self.sttr_url_per_activity.items():
                 identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
-                response = self.session.get(url, headers=self.headers)
+                response = self.session.get(url, headers=self.session_headers)
                 
                 if response.status_code == 200:
                     file_path = os.path.join(log_dir, f'STTR_{identifier}_{key}.xml')
