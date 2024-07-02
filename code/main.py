@@ -1,8 +1,9 @@
 from rtr import RTR
+from commands import ArgumentParser  
 
 def main():
-    software = "Match"
-    RTR(software).archive_activities()
+    args = ArgumentParser.parse_command_line_arguments()
+    RTR(args).archive_activities()
 
 if __name__ == "__main__":
     main()
