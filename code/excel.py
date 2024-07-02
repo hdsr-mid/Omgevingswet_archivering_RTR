@@ -42,8 +42,9 @@ class ExcelHandler:
 
     def write_data_to_cells(self, row, data_to_write):
         col = 0
+        AANTAL_WERKZAAMHEDEN_COL = 2
         for content in data_to_write:
-            if content == 1 and col != 2:
+            if content == 1 and col != AANTAL_WERKZAAMHEDEN_COL:
                 empty_string = " "
                 self.worksheet.write(row - 1, col, empty_string, self.blue_format)
             else:
