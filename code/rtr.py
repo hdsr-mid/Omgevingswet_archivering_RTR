@@ -42,8 +42,9 @@ class RTR:
         
         headers = [
             "Activiteit                   ",
-            "Urn",
-            "Werkzaamheden",
+            "Urn",              
+            "Aantal werkzaamheden",
+            "Werkzaamheden",          
             "Wijziging Conclusie",
             "Wijziging Melding",
             "Wijziging Aanvraag vergunning",
@@ -70,7 +71,7 @@ class RTR:
     def process_activity(self, activity, row):
         government, name, uri = activity
         response_json = self.get_activity_data(uri)
-
+        
         if response_json:
             self.archive_activity_data(row, name, uri, response_json)
 
@@ -158,12 +159,14 @@ class RTR:
     @staticmethod
     def extract_werkzaamheden(data):
         werkzaamheden_list = []
+        counter = 0
         if "werkzaamheden" in data["_links"]:
             for werkzaamheid in data["_links"]["werkzaamheden"]:
                 extracted_id = werkzaamheid["href"].split("/")[(-1)]
                 clean_id = extracted_id.split("?")[0]
                 werkzaamheden_list.append(clean_id)
-        return [', '.join(werkzaamheden_list)] if werkzaamheden_list else [""]
+                counter += 1
+        return [counter, [', '.join(werkzaamheden_list)] if werkzaamheden_list else [""]]
 
     def fetch_and_process_changes(self, data):
         urn_name = data["urn"].split(".")[-1]
@@ -260,8 +263,8 @@ class RTR:
         for gebied in self.werkingsgebied_per_activity.get(name, []):
             activity_werkingsgebieden_presence[werkingsgebieden_indices[gebied]] = 1
             
-        data_to_write = [name, uri] + werkzaamheden + changes + activity_werkingsgebieden_presence
-        self.excel_handler.write_data_to_cells(row, data_to_write)
+        data_to_write = [name, uri, werkzaamheden[0]] + werkzaamheden[1] + changes + activity_werkingsgebieden_presence
+        self.excel_handler.write_data_to_cells(row, data_to_write)       
         
     def decodeSpecialChar(self, string):
         return string.encode("latin1").decode("utf-8")
