@@ -23,7 +23,7 @@ Voeg de productie- en pre-omgeving API-keys toe aan de volgende bestanden, deze 
 data/prod_API_key.txt
 data/pre_API_key.txt
 ```
-# Install
+
 Installeer de volgende Python dependencies.
 ```
 pip install requests
