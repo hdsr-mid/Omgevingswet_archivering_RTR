@@ -259,17 +259,11 @@ class RTR:
         werkingsgebieden_indices = {gebied: index for index, gebied in enumerate(unique_werkingsgebieden)}
         activity_werkingsgebieden_presence = [" "] * len(unique_werkingsgebieden)
 
-        for gebied in self.werkingsgebied_per_activity.get(name, []):
+        for gebied in self.werkingsgebied_per_activity.get(name.lower(), []):
             activity_werkingsgebieden_presence[werkingsgebieden_indices[gebied]] = 1
             
         data_to_write = [name, uri, werkzaamheden[0]] + werkzaamheden[1] + changes + activity_werkingsgebieden_presence
-        self.excel_handler.write_data_to_cells(row, data_to_write)     
-        
-        #no_gebied_written = 1 not in activity_werkingsgebieden_presence
-        #if no_gebied_written:
-        print()
-        print(name, activity_werkingsgebieden_presence, unique_werkingsgebieden)  
-            
+        self.excel_handler.write_data_to_cells(row, data_to_write)                 
         
     def decodeSpecialChar(self, string):
         return string.encode("latin1").decode("utf-8")
