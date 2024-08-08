@@ -117,7 +117,7 @@ class RTR:
             self.werkingsgebied_per_activity[activity_description].extend(matched_descriptions)
         else:
             self.werkingsgebied_per_activity[activity_description] = matched_descriptions
-
+        
     def invert_werkingsgebied_mapping(self):
         gebied_to_activities = {}
         for activity, gebieden in self.werkingsgebied_per_activity.items():
@@ -263,7 +263,13 @@ class RTR:
             activity_werkingsgebieden_presence[werkingsgebieden_indices[gebied]] = 1
             
         data_to_write = [name, uri, werkzaamheden[0]] + werkzaamheden[1] + changes + activity_werkingsgebieden_presence
-        self.excel_handler.write_data_to_cells(row, data_to_write)       
+        self.excel_handler.write_data_to_cells(row, data_to_write)     
+        
+        #no_gebied_written = 1 not in activity_werkingsgebieden_presence
+        #if no_gebied_written:
+        print()
+        print(name, activity_werkingsgebieden_presence, unique_werkingsgebieden)  
+            
         
     def decodeSpecialChar(self, string):
         return string.encode("latin1").decode("utf-8")
