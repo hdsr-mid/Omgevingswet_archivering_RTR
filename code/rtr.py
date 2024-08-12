@@ -2,6 +2,7 @@ import os
 import requests
 import urllib.parse
 from collections import OrderedDict
+from datetime import datetime
 
 from excel import ExcelHandler
 from powerbi import PowerBIData
@@ -218,7 +219,9 @@ class RTR:
             print(f"Data missing key: '{e}'. Regelbeheerobject: {identifier}")
 
     def archive_sttr_files(self):
-            log_dir = os.path.join(self.base_dir, 'log', 'STTR_RegelBeheerObjecten')
+            date_from_arg = datetime.strptime(self.args.date, "%d-%m-%Y")
+            formatted_date = date_from_arg.strftime("%Y%m%d")
+            log_dir = os.path.join(self.base_dir, 'log', f"{formatted_date}_STTR_DMN-files")
             
             os.makedirs(log_dir, exist_ok=True)
             
