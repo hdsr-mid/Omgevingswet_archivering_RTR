@@ -13,8 +13,8 @@ class ExcelHandler:
         self.setup_worksheet()
 
     def generate_workbook_path(self, bestuursorgaan, base_dir, env, date):
-        document_name = f'{bestuursorgaan.replace(" ", "_")}_waterschapsverordening_RTR_{env}_status_{date}.xlsx'
-        return os.path.join(base_dir, f"log/{document_name}")
+        document_name = self.generate_file_name(base_dir, date, bestuursorgaan, env, "status", is_folder=False)
+        return document_name
 
     def create_format(self, color, bold, text_wrap, border):
         return self.workbook.add_format({
@@ -76,3 +76,14 @@ class ExcelHandler:
     def close_workbook(self):
         self.workbook.close()
 
+    @staticmethod
+    def generate_file_name(base_dir, date_str, overheid, env, suffix, is_folder=True):
+        date_from_arg = datetime.strptime(date_str, "%d-%m-%Y")
+        formatted_date = date_from_arg.strftime("%Y%m%d")
+        environment = "productie-omgeving" if env == "prod" else "pre-omgeving"
+        base_name = f"{formatted_date}_{overheid.replace(' ', '_')}_{environment}_STTR"
+        
+        if is_folder:
+            return os.path.join(base_dir, f"log/{base_name}_{suffix}")
+        else:
+            return os.path.join(base_dir, f"log/{base_name}_{suffix}.xls")
