@@ -8,7 +8,7 @@ AANTAL_WERKZAAMHEDEN_COL = 2
 class ExcelHandler:
     def __init__(self, bestuursorgaan, base_dir, env, date, headers):
         self.headers = headers
-        self.workbook_path = self.generate_file_path(date, bestuursorgaan, env, "status", base_dir, extension="xls")
+        self.workbook_path = self.generate_file_path(date, bestuursorgaan, env, "status", base_dir, extension="xlsx")
         self.workbook = xlsxwriter.Workbook(self.workbook_path)
         self.worksheet = self.workbook.add_worksheet()
         self.cell_format = self.create_format('white', bold=False, text_wrap=False, border=True)
