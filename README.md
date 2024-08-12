@@ -2,7 +2,7 @@
 
 Via deze scripts kunnen gegevens uit de RTR worden opgevraagd en lokaal worden gearchiveerd. Denk daarbij aan het genereren van een Excel overzicht van activiteiten en hun bijbehorende werkzaamheden en regelbeheerobjecten en het downloaden van de DMN logica uit de STTR. 
 
-![Voorbeeld voor Hoogheemraadschap de Stichtse Rijnlanden](log/xlsx_example.PNG)
+![Voorbeeld voor Hoogheemraadschap de Stichtse Rijnlanden](data/xlsx_example.PNG)
 
 ## Gebruik
 ```
