@@ -2,8 +2,8 @@ import os
 from datetime import datetime
 import xlsxwriter
 
-HEADERS_BEFORE_WERKINGSGEBIEDEN = 10
-AANTAL_WERKZAAMHEDEN_COL = 2
+HEADERS_BEFORE_WERKINGSGEBIEDEN = 8
+AANTAL_WERKZAAMHEDEN_COLUMN_COUNT = 2
 
 class ExcelHandler:
     def __init__(self, bestuursorgaan, base_dir, env, date, headers):
@@ -39,7 +39,7 @@ class ExcelHandler:
 
     def write_data_to_cells(self, row, data_to_write):
         for col, content in enumerate(data_to_write):
-            if content == 1 and col != AANTAL_WERKZAAMHEDEN_COL:
+            if content == 1 and col != AANTAL_WERKZAAMHEDEN_COLUMN_COUNT:
                 self.worksheet.write(row - 1, col, " ", self.blue_format)
             else:
                 self.write_content(row - 1, col, content)
