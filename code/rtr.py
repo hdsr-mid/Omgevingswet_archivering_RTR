@@ -219,7 +219,7 @@ class RTR:
             print(f"Data missing key: '{e}'. Regelbeheerobject: {identifier}")
 
     def archive_sttr_files(self):
-        folder_name = self.excel_handler.generate_file_name(self.base_dir, self.args.date, self.args.overheid, self.args.env, "DMN-files", is_folder=True)
+        folder_name = self.excel_handler.generate_file_path(self.args.date, self.args.overheid, self.args.env, "DMN-files", self.base_dir)
         os.makedirs(folder_name, exist_ok=True)
             
         for key, url in self.sttr_url_per_activity.items():

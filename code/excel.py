@@ -5,16 +5,12 @@ import xlsxwriter
 class ExcelHandler:
     def __init__(self, bestuursorgaan, base_dir, env, date, headers):
         self.headers = headers
-        self.workbook_path = self.generate_workbook_path(bestuursorgaan, base_dir, env, date)
+        self.workbook_path = self.generate_file_path(date, bestuursorgaan, env, "status", base_dir, extension="xls")
         self.workbook = xlsxwriter.Workbook(self.workbook_path)
         self.worksheet = self.workbook.add_worksheet()
         self.cell_format = self.create_format('white', bold=False, text_wrap=False, border=True)
         self.blue_format = self.create_format('#538DD5', bold=False, text_wrap=False, border=True)
         self.setup_worksheet()
-
-    def generate_workbook_path(self, bestuursorgaan, base_dir, env, date):
-        document_name = self.generate_file_name(base_dir, date, bestuursorgaan, env, "status", is_folder=False)
-        return document_name
 
     def create_format(self, color, bold, text_wrap, border):
         return self.workbook.add_format({
@@ -77,13 +73,15 @@ class ExcelHandler:
         self.workbook.close()
 
     @staticmethod
-    def generate_file_name(base_dir, date_str, overheid, env, suffix, is_folder=True):
+    def generate_file_path(date_str, overheid, env, suffix, base_dir, extension=None):
         date_from_arg = datetime.strptime(date_str, "%d-%m-%Y")
         formatted_date = date_from_arg.strftime("%Y%m%d")
         environment = "productie-omgeving" if env == "prod" else "pre-omgeving"
-        base_name = f"{formatted_date}_{overheid.replace(' ', '_')}_{environment}_STTR"
+        base_name = f"{formatted_date}_{overheid.replace(' ', '_')}_{environment}_STTR_{suffix}"
         
-        if is_folder:
-            return os.path.join(base_dir, f"log/{base_name}_{suffix}")
+        if extension:
+            full_name = f"{base_name}.{extension}"
         else:
-            return os.path.join(base_dir, f"log/{base_name}_{suffix}.xls")
+            full_name = base_name  # No extension, treat as folder
+        
+        return os.path.join(base_dir, f"log/{full_name}")
