@@ -2,6 +2,7 @@ import os
 import requests
 import urllib.parse
 from collections import OrderedDict
+from datetime import datetime
 
 from excel import ExcelHandler
 from powerbi import PowerBIData
@@ -218,20 +219,19 @@ class RTR:
             print(f"Data missing key: '{e}'. Regelbeheerobject: {identifier}")
 
     def archive_sttr_files(self):
-            log_dir = os.path.join(self.base_dir, 'log', 'STTR_RegelBeheerObjecten')
+        folder_name = self.excel_handler.generate_file_path(self.args.date, self.args.overheid, self.args.env, "DMN-files", self.base_dir)
+        os.makedirs(folder_name, exist_ok=True)
             
-            os.makedirs(log_dir, exist_ok=True)
-            
-            for key, url in self.sttr_url_per_activity.items():
-                identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
-                response = self.session.get(url, headers=self.session_headers)
+        for key, url in self.sttr_url_per_activity.items():
+            identifier = url.split('/toepasbareRegels/')[1].split('/')[0]
+            response = self.session.get(url, headers=self.session_headers)
                 
-                if response.status_code == 200:
-                    file_path = os.path.join(log_dir, f'STTR_{identifier}_{key}.xml')
-                    with open(file_path, 'w', encoding='utf-8') as file:
-                        file.write(response.text)
-                else:
-                    print(f"Failed to download data from {url}, status code: {response.status_code}")
+            if response.status_code == 200:
+                file_path = os.path.join(folder_name, f'STTR_{identifier}_{key}.xml')
+                with open(file_path, 'w', encoding='utf-8') as file:
+                    file.write(response.text)
+            else:
+                print(f"Failed to download data from {url}, status code: {response.status_code}")
 
     def extract_identifier(self, data):
         try:
