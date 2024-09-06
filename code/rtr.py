@@ -46,7 +46,7 @@ class RTR:
 
     def archive_activities(self):
         for activity in self.urns:
-            print(activity)
+            #print(activity)
             self.collect_unique_werkingsgebieden(activity)
         
         headers = self.headers + sorted(self.unique_werkingsgebieden)
@@ -89,6 +89,12 @@ class RTR:
         activity_description = self.extract_activity_description(json_data)
         identifications = self.extract_identifications(json_data)
         matched_descriptions = self.match_descriptions(identifications)
+        
+        #print("activity:       ", activity_description)
+        #print("identifications:", identifications) #mistake around here
+        #print("descriptions:   ", matched_descriptions)
+        #print()
+        
         self.update_activity_mapping(activity_description, matched_descriptions)
 
     def extract_activity_description(self, json_data):
@@ -105,19 +111,32 @@ class RTR:
         return matched_descriptions
 
     def get_description(self, url):
+
         if self.geo_variables.get(url) != None:
+            
+            print(self.geo_variables.get(url))
+            print()
+            
             return self.geo_variables.get(url)
         elif "ambtsgebied" in url:
             return 'Ambtsgebied'
         else:
+            #self.geo_variables[url] = url
             return url
             
     def update_activity_mapping(self, activity_description, matched_descriptions):
         self.unique_werkingsgebieden.update(matched_descriptions)
         if activity_description in self.werkingsgebied_per_activity:
             self.werkingsgebied_per_activity[activity_description].extend(matched_descriptions)
+            #print("GEO1", activity_description, matched_descriptions)
+            
+            #if activity_description == "varen":
+                #print("GEO1", activity_description, '\n', matched_descriptions)
         else:
             self.werkingsgebied_per_activity[activity_description] = matched_descriptions
+            
+            #if activity_description == "varen":
+                #print("GEO2", activity_description, '\n', matched_descriptions)
         
     def invert_werkingsgebied_mapping(self):
         gebied_to_activities = {}
