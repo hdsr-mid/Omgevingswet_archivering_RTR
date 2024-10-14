@@ -6,7 +6,6 @@ Via deze scripts kunnen gegevens uit de RTR worden opgevraagd en lokaal worden g
 ## Gebruik
 ```
 --overheid                # Typ de juiste overheid . . . . . . . . . . . standaard: Hoogheemraadschap_De_Stichtse_Rijnlanden
---env prod/pre            # Selecteer de gewenste omgeving . . . . . . . standaard: prod
 --date 01-01-2024         # Kies een datum . . . . . . . . . . . . . . . standaard: vandaag
 --sttr                    # Archiveer de DMN logica per activiteit . . . standaard: uit
 --location                # Archiveer werkingsgebieden per activiteit. . standaard: uit
@@ -15,7 +14,8 @@ voorbeeld: python.exe code/log_RTR_status_via_API.py -- overheid Waterschap_Vech
 voorbeeld: python.exe code/log_RTR_status_via_API.py -- overheid Wetterskip_Fryslân --env pre --date 03-03-2024
 voorbeeld: python.exe code/log_RTR_status_via_API.py -- overheid --env prod --date 12-04-2024 --sttr --location
 
-De volgorde van de flags maakt niet uit, als een flag niet word aangeroepen gebruikt die zijn standaard waarde.
+De volgorde van de flags maakt niet uit, als een flag niet word aangeroepen gebruikt die zijn standaard waarde. De volgende flags zijn tijdelijk niet beschikbaar --env prod/pre            # Selecteer de gewenste omgeving . . . . . . . standaard: prod
+
 ```
 
 ## Setup
