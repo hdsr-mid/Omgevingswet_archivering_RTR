@@ -2,8 +2,8 @@ import os
 from datetime import datetime
 import xlsxwriter
 
-HEADERS_BEFORE_WERKINGSGEBIEDEN = 10
-AANTAL_WERKZAAMHEDEN_COL = 2
+HEADER_INDICES_BEFORE_WERKINGSGEBIEDEN = 8
+AANTAL_WERKZAAMHEDEN_COLUMN_INDEX = 2
 
 class ExcelHandler:
     def __init__(self, bestuursorgaan, base_dir, env, date, headers):
@@ -34,12 +34,12 @@ class ExcelHandler:
     def adjust_column_widths(self):
         for i, header in enumerate(self.headers, 1):
             padding = 4
-            column_width = 4 if i > HEADERS_BEFORE_WERKINGSGEBIEDEN else len(header) + padding
+            column_width = 4 if i > HEADER_INDICES_BEFORE_WERKINGSGEBIEDEN else len(header) + padding
             self.worksheet.set_column(i - 1, i - 1, column_width)
 
     def write_data_to_cells(self, row, data_to_write):
         for col, content in enumerate(data_to_write):
-            if content == 1 and col != AANTAL_WERKZAAMHEDEN_COL:
+            if content == 1 and col != AANTAL_WERKZAAMHEDEN_COLUMN_INDEX:
                 self.worksheet.write(row - 1, col, " ", self.blue_format)
             else:
                 self.write_content(row - 1, col, content)
