@@ -1,3 +1,5 @@
+Activiteit gereguleerd in de waterschapsverordening De Stichtse Rijnlanden		nl.imow-mnre1034.activiteit.ActInWaterschapsverordening	nl.imow-ws0636.activiteit.ActInWaterschapsVerordWs	Zorgplicht	Waterstaatswerkenactiviteit	1.1	HDSR
+Maatwerkvoorschrift aanvragen	nl.imow-ws0636.activiteit.ActInWaterschapsVerordWs	nl.imow-ws0636.activiteit.Maatwerkvoorschrift	Zorgplicht	Waterstaatswerkenactiviteit	1.5	HDSR
 Lozingsactiviteit gereguleerd in de waterschapsverordening		nl.imow-ws0636.activiteit.ActInWaterschapsVerordWs	nl.imow-ws0636.activiteit.LozingsActiviteit	Zorgplicht	Lozingsactiviteit	2.1	HDSR
 lozen van grondwater bij sanering of ontwatering	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenGrondwaterSanOnt	Zorgplicht	Lozingsactiviteit	2.2	HDSR
 lozen van afvloeiend hemelwater dat niet afkomstig is van een bodembeschermende voorziening	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.LozenAfvlHemelwater	Zorgplicht	Lozingsactiviteit	2.3	HDSR
@@ -18,9 +20,22 @@ lozen vanaf vaartuigen of andere drijvende werktuigen bij spoelen of scheiden va
 asverstrooiing	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.Asverstrooiing	Zorgplicht	Lozingsactiviteit	2.18	HDSR
 andere lozingen	nl.imow-ws0636.activiteit.LozingsActiviteit	nl.imow-ws0636.activiteit.AndereLozingen	Zorgplicht	Lozingsactiviteit	2.19	HDSR
 Wateronttrekkingsactiviteit gereguleerd in de waterschapsverordening		nl.imow-ws0636.activiteit.ActInWaterschapsVerordWs	nl.imow-ws0636.activiteit.WateronttrekAct	Zorgplicht	Wateronttrekkingsactiviteit	3.1	HDSR
-oppervlaktewater onttrekken	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.OppervlakteWatOnttrek	Zorgplicht	Wateronttrekkingsactiviteit	3.8	HDSR
-water in de bodem of terug in de bodem brengen	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.WaterTerugInDeBodemBrengen	Zorgplicht	Wateronttrekkingsactiviteit	3.7	HDSR
-grondwater onttrekken	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.GrondwaterOnttrek	Zorgplicht	Wateronttrekkingsactiviteit	3.3	HDSR
+oppervlaktewater onttrekken	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.OppervlakteWatOnttrek	Zorgplicht	Wateronttrekkingsactiviteit	3.4	HDSR
+water infiltreren	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.WaterTerugInDeBodemBrengen	Zorgplicht	Wateronttrekkingsactiviteit	3.3	HDSR
+Grondwater onttrekken in een bouwput	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.GwOBouwput	Zorgplicht	Wateronttrekkingsactiviteit	3.2.1	HDSR
+Grondwater onttrekken in een sleuf	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.GwOSleuf	Zorgplicht	Wateronttrekkingsactiviteit	3.2.2	HDSR
+Grondwater onttrekken voor een grondwatersanering	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.GwOGWSanering	Zorgplicht	Wateronttrekkingsactiviteit	3.2.3	HDSR
+Grondwater onttrekken voor een beheersmaatregel	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.GwOBHMaatregel	Zorgplicht	Wateronttrekkingsactiviteit	3.2.4	HDSR
+Grondwater onttrekken voor een project	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.GwOProject	Zorgplicht	Wateronttrekkingsactiviteit	3.2.5	HDSR
+Grondwater onttrekken door drainage	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.GwODrainage	Zorgplicht	Wateronttrekkingsactiviteit	3.2.6	HDSR
+Grondwater onttrekken voor een ondergronds bouwwerk en infrastructuur	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.GwOBouwwerk	Zorgplicht	Wateronttrekkingsactiviteit	3.2.7	HDSR
+Grondwater onttrekken voor een brandblusvoorziening	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.GwOBBVoorziening	Zorgplicht	Wateronttrekkingsactiviteit	3.2.8	HDSR
+Grondwater onttrekken voor bedrijfsmatige toepassing	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.GwOBMToepassing	Zorgplicht	Wateronttrekkingsactiviteit	3.2.9	HDSR
+Grondwater onttrekken voor huishoudelijke of kleinschalige toepassing	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.GwOKSToepassing	Zorgplicht	Wateronttrekkingsactiviteit	3.2.10	HDSR
+Grondwater onttrekken voor drinkwater voor vee	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.GwODrinkwatervoorVee	Zorgplicht	Wateronttrekkingsactiviteit	3.2.11	HDSR
+Grondwater onttrekken voor menselijke consumptie	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.GwODrinkwaterMenselijke	Zorgplicht	Wateronttrekkingsactiviteit	3.2.12	HDSR
+Grondwater onttrekken voor een onderzoek	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.GwOOnderzoek	Zorgplicht	Wateronttrekkingsactiviteit	3.2.13	HDSR
+water in de bodem brengen	nl.imow-ws0636.activiteit.WateronttrekAct	nl.imow-ws0636.activiteit.GwOWaterInDeBodem	Zorgplicht	Wateronttrekkingsactiviteit	3.5	HDSR
 Beperkingengebiedactiviteit met betrekking tot een waterstaatswerk in beheer bij het waterschap		nl.imow-ws0636.activiteit.ActInWaterschapsVerordWs	nl.imow-ws0636.activiteit.BeperkingengebiedAct	Zorgplicht	Beperkingengebiedactiviteit	4.1	HDSR
 brug aanleggen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.BrugAanleggen	Zorgplicht	Beperkingengebiedactiviteit	4.7.1	HDSR
 brug verwijderen	nl.imow-ws0636.activiteit.BeperkingengebiedAct	nl.imow-ws0636.activiteit.BrugVerwijderen	Zorgplicht	Beperkingengebiedactiviteit	4.7.2	HDSR
