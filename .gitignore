@@ -7,3 +7,5 @@
 # Exclude API-keys
 code/pre_API_key.txt
 code/prod_API_key.txt
+data/prod_API_key.txt
+data/pre_API_key.txt
