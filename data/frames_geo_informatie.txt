@@ -1,40 +1,39 @@
-1	Bebouwd gebied	[Geo Data] Bebouwde gebieden	bebouwd gebied	Rode_contour							
-2	Beheergebied Oost	[Geo Data] Beheergebied oost	beheergebied oost	WG_O_ARK							
-3	Beheergebied West	[Geo Data] Beheergebied West	beheergebied west	WG_W_ARK							
-4	Beschermingszone A van een watergang	[Geo Data] Beschermingszone A	beschermingszone A	WG_BZ_A							
-5	Beschermingszone B van een beschoeiing	[Geo Data] Beschermingszone B	beschermingszone B, Beschermingszone B van beschoeiingen	WG_BZ_B							
-6	Beschermingszone K van een kunstwerk	[Geo Data] Beschermingszone K	beschermingszone K van een kunstwerk	WG_BZ_K							
-7	Beschermingszone K van een peilregelend kunstwerk	[Geo Data] Beschermingszone K van een peilregelend kunstwerk	beschermingszone K van een peilregelend kunstwerk	WG_BZ_peilregulerende_kunstw							
-8	Beschermingszone niet verheelde overige waterkering	[Geo Data] Niet verheelde overige kering beschermingszone	beschermingszone van een niet verheelde overige waterkering	WK_OK_BZ_nietverh							
-9	Beschermingszone niet verheelde regionale waterkering	[Geo Data] Niet verheelde regionale kering beschermingszone	beschermingszone van een niet verheelde regionale waterkering	WK_RK_BZ_nietverh							
-10	Beschermingszone overige waterkering	[Geo Data] Overige kering beschermingszone	beschermingszone van een overige waterkering	WK_OK_BZ							
-11	Beschermingszone primaire waterkering	[Geo Data] Primaire kering beschermingszone	beschermingszone van een primaire waterkering	WK_PK_BZ							
-12	Beschermingszone regionale waterkering	[Geo Data] Regionale kering beschermingszone	beschermingszone van een regionale waterkering	WK_RK_BZ							
-13	Beschermingszone zomerkade	[Geo Data] Zomerkade beschermingszone	beschermingszone van een zomerkade	WK_ZK_BZ							
-15	Enkele Wiericke en bovenloop Kromme Rijn	[Geo Data] Enkele Wiericke en bovenloop Kromme Rijn	Enkele Wiericke en de bovenloop van de Kromme Rijn	WG_VW_bKRR_EWI							
-16	Grondwatergevoelig natuurgebied	[Geo Data] Grondwatergevoelige natuur	grondwatergevoelig natuurgebied	GW_natuur_18B							
-17	Klei op veen- of veengronden	[Geo Data] Klei op veen- of veengronden	klei op veen- of veengronden	BO_VenKlopV							
-18	Natuurvriendelijke oever	[Geo Data] Natuurvriendelijke oever	een natuurvriendelijke oever	WG_NVO							
-19	Onderhoudsvaarwater	[Geo Data] Onderhoudsvaarwater	onderhoudsvaarwater	WG_OHVW							
-20	Waterkering langs de Gekanaliseerde Hollandsche IJssel	[Geo Data] Overige kering Gekanaliseerde Hollandsche IJssel	waterkering langs de Gekanaliseerde Hollandsche IJssel	WK_OK_ZWW_GHIJ							
-21	Primaire droge sloot	[Geo Data] Primaire droge sloot	primaire droge sloot	WG_PW_DP							
-22	Primaire watergang	[Geo Data] Primaire watergang	primaire watergang	WG_PW_KZ							
-23	Profiel van vrije ruimte van primaire waterkering	[Geo Data] Vrije ruimte primaire kering	profiel van vrije ruimte van een primaire waterkering	WK_PK_PVVR							
-24	Secundaire watergang	[Geo Data] Secundaire watergang	secundaire watergang	WG_SW_KZ							
-27	Tertiaire watergang met geborgde afmetingen	[Geo Data] Tertiaire watergang met geborgde afmetingen	tertiaire watergang-met geborgde afmetingen	WG_TW_geb_afm							
-25	Tertiaire droge sloot	[Geo Data] Tertiaire droge sloot	tertiaire droge sloot	WG_TW_DP							
-26	Tertiaire watergang	[Geo Data] Tertiaire watergang	tertiaire watergang	WG_TW_KZ							
-14	Droge sloot	[Geo Data] Droge sloot	droge sloot	WG_DP							
-28	Utrechtse Heuvelrug	[Geo Data] Utrechtse Heuvelrug	Utrechtse Heuvelrug	Utrechtse_Heuvelrug							
-29	Vaarweg	[Geo Data] Vaarweg	een vaarweg	WG_VW							
-30	Watergang met groot afvoerdebiet	[Geo Data] Watergang met groot afvoerdebiet	watergang met een groot afvoerdebiet	WG_GA							
-31	Zone waterstaatswerk niet verheelde overige waterkering	[Geo Data] Niet verheelde overige waterkering zone waterstaatswerk	zone waterstaatswerk van een niet verheelde overige waterkering	WK_OK_ZWW_nietverh							
-32	Zone waterstaatswerk niet verheelde regionale waterkering	[Geo Data] Niet verheelde regionale kering zone waterstaatswerk	zone waterstaatswerk van een niet verheelde regionale waterkering	WK_RK_ZWW_nietverheeld							
-33	Zone waterstaatswerk overige waterkering	[Geo Data] Overige kering zone waterstaatswerk	zone waterstaatswerk van een overige waterkering	WK_OK_ZWW							
-34	Zone waterstaatswerk primaire waterkering	[Geo Data] Primaire kering zone waterstaatswerk	zone waterstaatswerk van een primaire waterkering	WK_PK_ZWW							
-35	Zone waterstaatswerk regionale waterkering	[Geo Data] Regionale waterkering zone waterstaatswerk	zone waterstaatswerk van een regionale waterkering	WK_RK_ZWW							
-36	Zone waterstaatswerk van een verheelde overige waterkering	[Geo Data] Zone waterstaatswerk van een verheelde overige waterkering	zone waterstaatswerk van een verheelde overige waterkering	WK_OK_ZWW_verheeld							
-37	Zone waterstaatswerk van een verheelde regionale waterkering	[Geo Data] Zone waterstaatswerk van een verheelde regionale waterkering	zone waterstaatswerk van een verheelde regionale waterkering	WK_RK_ZWW_verheeld							
-38	Zone waterstaatswerk zomerkade	[Geo Data] Zomerkade zone waterstaatswerk	zone waterstaatswerk van een zomerkade	WK_ZK_ZWW							
-39	Gebied met minimaal duikerdiameter 0.80 meter	[Geo Data] Gebied met minimale duikerdiameter 0.80 m	gebied met een minimale duikerdiameter van 0,80 m	WG_08							
-40	Aangewezen oppervlaktewaterlichaam	[Geo Data] Aangewezen oppervlaktewaterlichaam	aangewezen oppervlaktewaterlichaam	WG_aangew			
+1	Beheergebied Oost	[Geo Data] Beheergebied oost	beheergebied oost	WG_O_ARK							
+2	Beheergebied West	[Geo Data] Beheergebied West	beheergebied west	WG_W_ARK							
+3	Beschermingszone A van een watergang	[Geo Data] Beschermingszone A	beschermingszone A	WG_BZ_A							
+4	Beschermingszone B van een beschoeiing	[Geo Data] Beschermingszone B	beschermingszone B van een beschoeiing, beschermingszone B	WG_BZ_B							
+5	Beschermingszone K van een kunstwerk	[Geo Data] Beschermingszone K	beschermingszone K van een kunstwerk	WG_BZ_K							
+6	Beschermingszone K van een peilregelend kunstwerk	[Geo Data] Beschermingszone K van een peilregelend kunstwerk	beschermingszone K van een peilregelend kunstwerk	WG_BZ_peilregulerende_kunstw							
+7	Beschermingszone niet verheelde overige waterkering	[Geo Data] Niet verheelde overige kering beschermingszone	beschermingszone van een niet verheelde overige waterkering	WK_OK_BZ_nietverh							
+8	Beschermingszone niet verheelde regionale waterkering	[Geo Data] Niet verheelde regionale kering beschermingszone	beschermingszone van een niet verheelde regionale waterkering	WK_RK_BZ_nietverh							
+9	Beschermingszone overige waterkering	[Geo Data] Overige kering beschermingszone	beschermingszone van een overige waterkering	WK_OK_BZ							
+10	Beschermingszone primaire waterkering	[Geo Data] Primaire kering beschermingszone	beschermingszone van een primaire waterkering	WK_PK_BZ							
+11	Beschermingszone regionale waterkering	[Geo Data] Regionale kering beschermingszone	beschermingszone van een regionale waterkering	WK_RK_BZ							
+12	Beschermingszone zomerkade	[Geo Data] Zomerkade beschermingszone	beschermingszone van een zomerkade	WK_ZK_BZ							
+13	Enkele Wiericke en bovenloop Kromme Rijn	[Geo Data] Enkele Wiericke en bovenloop Kromme Rijn	Enkele Wiericke en de bovenloop van de Kromme Rijn	WG_VW_bKRR_EWI							
+14	Grondwatergevoelig natuurgebied	[Geo Data] Grondwatergevoelige natuur	grondwatergevoelige natuur	GW_natuur_18B							
+15	Klei op veen- of veengronden	[Geo Data] Klei op veen- of veengronden	klei op veen- of veengronden	BO_VenKlopV							
+16	Natuurvriendelijke oever	[Geo Data] Natuurvriendelijke oever	een natuurvriendelijke oever	WG_NVO							
+17	Onderhoudsvaarwater	[Geo Data] Onderhoudsvaarwater	onderhoudsvaarwater	WG_OHVW							
+18	Waterkering langs de Gekanaliseerde Hollandsche IJssel	[Geo Data] Overige kering Gekanaliseerde Hollandsche IJssel	waterkering langs de Gekanaliseerde Hollandsche IJssel	WK_OK_ZWW_GHIJ							
+19	Primaire droge sloot	[Geo Data] Primaire droge sloot	primaire droge sloot	WG_PW_DP							
+20	Primaire watergang	[Geo Data] Primaire watergang	primaire watergang	WG_PW_KZ							
+21	Profiel van vrije ruimte van primaire waterkering	[Geo Data] Vrije ruimte primaire kering	profiel van vrije ruimte van een primaire waterkering	WK_PK_PVVR							
+22	Secundaire watergang	[Geo Data] Secundaire watergang	secundaire watergang	WG_SW_KZ							
+23	Tertiaire watergang met geborgde afmetingen	[Geo Data] Tertiaire watergang met geborgde afmetingen	tertiaire watergang met geborgde afmetingen	WG_TW_geb_afm							
+24	Tertiaire droge sloot	[Geo Data] Tertiaire droge sloot	tertiaire droge sloot	WG_TW_DP							
+25	Tertiaire watergang	[Geo Data] Tertiaire watergang	tertiaire watergang	WG_TW_KZ							
+26	Droge sloot	[Geo Data] Droge sloot	droge sloot	WG_DP							
+27	Utrechtse Heuvelrug	[Geo Data] Utrechtse Heuvelrug	Utrechtse Heuvelrug	Utrechtse_Heuvelrug							
+28	Vaarweg	[Geo Data] Vaarweg	een vaarweg	WG_VW							
+29	Watergang met groot afvoerdebiet	[Geo Data] Watergang met groot afvoerdebiet	watergang met een groot afvoerdebiet	WG_GA							
+30	Zone waterstaatswerk niet verheelde overige waterkering	[Geo Data] Niet verheelde overige waterkering zone waterstaatswerk	zone waterstaatswerk van een niet verheelde overige waterkering	WK_OK_ZWW_nietverh							
+31	Zone waterstaatswerk niet verheelde regionale waterkering	[Geo Data] Niet verheelde regionale kering zone waterstaatswerk	zone waterstaatswerk van een niet verheelde regionale waterkering	WK_RK_ZWW_nietverheeld							
+32	Zone waterstaatswerk overige waterkering	[Geo Data] Overige kering zone waterstaatswerk	zone waterstaatswerk van een overige waterkering	WK_OK_ZWW							
+33	Zone waterstaatswerk primaire waterkering	[Geo Data] Primaire kering zone waterstaatswerk	zone waterstaatswerk van een primaire waterkering	WK_PK_ZWW							
+34	Zone waterstaatswerk regionale waterkering	[Geo Data] Regionale waterkering zone waterstaatswerk	zone waterstaatswerk van een regionale waterkering	WK_RK_ZWW							
+35	Zone waterstaatswerk van een verheelde overige waterkering	[Geo Data] Zone waterstaatswerk van een verheelde overige waterkering	zone waterstaatswerk van een verheelde overige waterkering	WK_OK_ZWW_verheeld							
+36	Zone waterstaatswerk van een verheelde regionale waterkering	[Geo Data] Zone waterstaatswerk van een verheelde regionale waterkering	zone waterstaatswerk van een verheelde regionale waterkering	WK_RK_ZWW_verheeld							
+37	Zone waterstaatswerk zomerkade	[Geo Data] Zomerkade zone waterstaatswerk	zone waterstaatswerk van een zomerkade	WK_ZK_ZWW							
+38	Gebied met minimaal duikerdiameter 0.80 meter	[Geo Data] Gebied met minimale duikerdiameter 0.80 m	gebied met een minimale duikerdiameter van 0,80 m	WG_08							
+39	Aangewezen oppervlaktewaterlichaam	[Geo Data] Aangewezen oppervlaktewaterlichaam	aangewezen oppervlaktewaterlichaam	WG_aangew	
